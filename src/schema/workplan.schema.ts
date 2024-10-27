@@ -1,6 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Types } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 import { BaseSchema } from './base/base.schema';
+
+export type WorkoutPlanDocument = HydratedDocument<WorkoutPlan>;
 @Schema()
 class ExerciseDetail {
   @Prop({ type: Types.ObjectId, ref: 'Exercise' })

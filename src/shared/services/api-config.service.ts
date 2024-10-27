@@ -33,10 +33,10 @@ export class ApiConfigService {
   }
 
   get mongoDbUri(): string {
-    const host = this.getString('DB_HOST');
-    const dbName = this.getString('DB_DATABASE');
-    const user = this.getString('DB_USERNAME');
-    const pass = this.getString('DB_PASSWORD');
+    const host = this.getString('MONGODB_CLUSTER');
+    const dbName = this.getString('MONGODB_DB_NAME');
+    const user = this.getString('MONGODB_USER');
+    const pass = this.getString('MONGODB_PASSWORD');
 
     return `mongodb+srv://${user}:${pass}@${host}/${dbName}`;
   }

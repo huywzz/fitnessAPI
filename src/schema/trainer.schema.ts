@@ -1,6 +1,8 @@
 import { BaseSchema } from './base/base.schema';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Types } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
+
+export type TrainerDocument = HydratedDocument<Trainer>;
 @Schema()
 class Message {
   @Prop()

@@ -8,6 +8,8 @@ import { RedisCloudModule } from './shared/configs/cache.config';
 import { GlobalException } from './shared/exceptions/global.exception';
 import { LoggingMiddleware } from './shared/middlewares/logging.middleware';
 import { ResponseInterceptor } from './shared/interceptors/response.interceptor';
+import { SharedModule } from './shared/shared.module';
+import { MongooseModule } from '@nestjs/mongoose';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -17,8 +19,11 @@ import { ResponseInterceptor } from './shared/interceptors/response.interceptor'
       expandVariables: true,
     }),
     StripeModule,
+    // MongooseModule.forRoot('mongodb+srv://fitnesscn4:Gjz82Uo5yl9xQ8Sm@cluster0.uo4lp.mongodb.net/fitnesscn4'),
+
     DatabaseModule,
     // RedisCloudModule,
+    SharedModule,
     AuthModule,
   ],
   providers: [
