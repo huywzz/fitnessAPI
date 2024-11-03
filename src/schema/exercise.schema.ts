@@ -7,30 +7,15 @@ export type ExerciseDocument = HydratedDocument<Exercise>;
 export class Exercise extends BaseSchema {
   @Prop()
   name: string;
-
-  @Prop()
-  equipment: string;
-
-  @Prop()
-  type: string;
-
-  @Prop()
-  reps: number;
-
-  @Prop()
-  sets: number;
-
-  @Prop()
-  restTime: number;
-
-  @Prop()
-  weight: number;
-
+  
   @Prop()
   gifUrl: string;
 
   @Prop([String])
   steps: string[];
+
+  @Prop({ type: Types.ObjectId, ref: 'Category' }) // Thêm category tham chiếu đến Category schema
+  category: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: 'Trainer' })
   createdBy: Types.ObjectId;

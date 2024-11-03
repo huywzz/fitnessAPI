@@ -20,8 +20,8 @@ class Profile {
   @Prop({ type: Types.ObjectId, ref: 'Trainer' })
   preferredTrainerId: Types.ObjectId;
 
-  @Prop()
-  goal: string;
+  @Prop({ type: Types.ObjectId, ref: 'Goal' })
+  goal: Types.ObjectId;
 }
 
 @Schema()
@@ -36,7 +36,7 @@ class Progress {
 @Schema()
 export class User extends BaseSchema {
   @Prop()
-  username: string;
+  fullName: string;
 
   @Prop({ unique: true })
   email: string;

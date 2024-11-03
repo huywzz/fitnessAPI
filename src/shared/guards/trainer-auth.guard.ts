@@ -2,12 +2,13 @@ import { UserService } from '../../modules/user/user.service';
 import { BadRequestException, CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ERRORS_DICTIONARY } from '../constraints/error-dictionary.constraint';
+import { TrainerService } from '@/modules/trainer/trainer.service';
 
 @Injectable()
-export class JwtAuthGuard implements CanActivate {
+export class TrainerAuth implements CanActivate {
   constructor(
     private jwtService: JwtService,
-    private userService: UserService,
+    private trainerService:TrainerService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -20,8 +21,8 @@ export class JwtAuthGuard implements CanActivate {
 
     try {
       const payload = this.jwtService.verify(token, { secret: process.env.JWT_SECRET });
-      const user = await this.userService.findOneOrThrowById(payload.sub);
-      request['user'] = user;
+      const trainer = await this.trainerService.findOneByIdOrThrow(payload.sub);
+      request['trainer'] = trainer;
 
       return true;
     } catch (error) {

@@ -29,6 +29,12 @@ export class Trainer extends BaseSchema {
   @Prop()
   name: string;
 
+  @Prop()
+  email: string;
+
+  @Prop()
+  password: string;
+
   @Prop([String])
   specialties: string[];
 

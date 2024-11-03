@@ -111,4 +111,13 @@ export class ApiConfigService {
   get documentationEnabled(): boolean {
     return this.getBoolean('ENABLE_DOCUMENTATION');
   }
+
+  get cloudinaryConfig() {
+    return {
+      cloudName: this.getString('CLOUDINARY_CLOUD_NAME'),
+      apiKey: this.getString('CLOUDINARY_API_KEY'),
+      apiSecret: this.getString('CLOUDINARY_API_SECRET'),
+      apiUrl: this.getString('CLOUDINARY_API_URL'),
+    };
+  }
 }
