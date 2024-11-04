@@ -21,6 +21,8 @@ export class TrainerAuth implements CanActivate {
 
     try {
       const payload = this.jwtService.verify(token, { secret: process.env.JWT_SECRET });
+      console.log(payload);
+      
       const trainer = await this.trainerService.findOneByIdOrThrow(payload.sub);
       request['trainer'] = trainer;
 

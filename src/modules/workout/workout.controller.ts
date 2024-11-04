@@ -1,15 +1,22 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { WorkoutService } from './workout.service';
-import { CreateWorkoutDto } from './dto/create-workout.dto';
-import { UpdateWorkoutDto } from './dto/update-workout.dto';
+import { CreateWorkoutPlanDto } from './dto/create-workout.dto';
+import { ApiBearerAuth, ApiProperty, ApiTags } from '@nestjs/swagger';
+import { TrainerAuth } from '@/shared/guards/trainer-auth.guard';
+import { Trainer } from '@/shared/decorators/trainer.decorator';
+import { GetDetailWorkOutDTO } from './dto/get-detail.workout-dto';
 
+@ApiTags('workout')
+@ApiBearerAuth('jwt')
 @Controller('workout')
 export class WorkoutController {
   constructor(private readonly workoutService: WorkoutService) {}
 
+  @UseGuards(TrainerAuth)
   @Post()
-  create(@Body() createWorkoutDto: CreateWorkoutDto) {
-    return this.workoutService.create(createWorkoutDto);
+  async create(@Body() createWorkoutDto: CreateWorkoutPlanDto, @Trainer() trainer) {
+    createWorkoutDto.trainerId = trainer._id;
+    return await this.workoutService.create(createWorkoutDto);
   }
 
   @Get()
@@ -18,13 +25,11 @@ export class WorkoutController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.workoutService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateWorkoutDto: UpdateWorkoutDto) {
-    return this.workoutService.update(+id, updateWorkoutDto);
+  findOne(
+    @Param('')
+    dto: GetDetailWorkOutDTO,
+  ) {
+    return this.workoutService.getWorkoutPlanById(dto.id);
   }
 
   @Delete(':id')

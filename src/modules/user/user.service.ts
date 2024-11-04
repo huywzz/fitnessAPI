@@ -72,8 +72,13 @@ export class UserService {
       },
       id,
     );
+    const convertToM=dto.height/100
+    const bmi = dto.weight / (convertToM*convertToM)
 
-    return updateUser;
+    return {
+      updateUser,
+      bmi
+    }
   }
 
   async updateGoal(dto: UpdateGoalDTO, id) {

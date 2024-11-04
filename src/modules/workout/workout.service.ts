@@ -1,11 +1,24 @@
-import { Injectable } from '@nestjs/common';
-import { CreateWorkoutDto } from './dto/create-workout.dto';
-import { UpdateWorkoutDto } from './dto/update-workout.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { CreateWorkoutPlanDto } from './dto/create-workout.dto';
+import { WorkoutRepository } from './workout.repository';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class WorkoutService {
-  create(createWorkoutDto: CreateWorkoutDto) {
-    return 'This action adds a new workout';
+  constructor(private readonly workoutRepository: WorkoutRepository) {}
+  async create(createWorkoutDto: CreateWorkoutPlanDto) {
+    return await this.workoutRepository.createWorkoutPlan(createWorkoutDto);
+  }
+
+  async getWorkoutPlanById(id: string) {
+    const workoutPlanId = new Types.ObjectId(id);
+    const workoutPlan = await this.workoutRepository.findByIdWithDetails(workoutPlanId);
+
+    if (!workoutPlan) {
+      throw new NotFoundException('Workout Plan not found');
+    }
+
+    return workoutPlan;
   }
 
   findAll() {
@@ -14,10 +27,6 @@ export class WorkoutService {
 
   findOne(id: number) {
     return `This action returns a #${id} workout`;
-  }
-
-  update(id: number, updateWorkoutDto: UpdateWorkoutDto) {
-    return `This action updates a #${id} workout`;
   }
 
   remove(id: number) {
