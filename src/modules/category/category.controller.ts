@@ -13,13 +13,14 @@ import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('category')
 @Controller('category')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
+  @ApiOperation({ summary: 'create category' })
   @UseInterceptors(FileInterceptor('file'))
   @Post()
   async create(@Body() createCategoryDto: CreateCategoryDto, @UploadedFile() file: Express.Multer.File) {
@@ -27,6 +28,7 @@ export class CategoryController {
     return this.categoryService.create(createCategoryDto, pathFile);
   }
 
+  @ApiOperation({ summary: 'get all category' })
   @Get()
   async findAll() {
     return this.categoryService.findAll();
