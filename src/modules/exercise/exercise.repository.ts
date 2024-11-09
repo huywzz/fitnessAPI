@@ -15,7 +15,7 @@ export class ExerciseRepository {
       category: new Types.ObjectId(createExerciseDto.category),
       createdBy: new Types.ObjectId(createExerciseDto.createdBy),
     });
-    return createdExercise.save();
+    return await createdExercise.save();
   }
 
   // Lấy tất cả bài tập

@@ -15,6 +15,7 @@ import { TrainerModule } from './modules/trainer/trainer.module';
 import { GoalModule } from './modules/goal/goal.module';
 import { ExerciseModule } from './modules/exercise/exercise.module';
 import { WorkoutModule } from './modules/workout/workout.module';
+import { CategoryModule } from './modules/category/category.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -35,6 +36,7 @@ import { WorkoutModule } from './modules/workout/workout.module';
     GoalModule,
     ExerciseModule,
     WorkoutModule,
+    CategoryModule,
   ],
   providers: [
     {
