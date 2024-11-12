@@ -25,9 +25,15 @@ export class ExerciseRepository {
 
   // Tìm bài tập theo ID
   async findById(id: string): Promise<Exercise> {
-    return this.exerciseModel.findById(id).populate('category').populate('createdBy').exec();
+    const _id = new Types.ObjectId(id);
+    return this.exerciseModel
+      .findById({
+        _id: _id,
+      })
+      .populate('category')
+      .populate('createdBy')
+      .exec();
   }
-
 
   // Xóa bài tập
   async delete(id: string): Promise<Exercise> {
@@ -36,6 +42,12 @@ export class ExerciseRepository {
 
   // Tìm tất cả bài tập theo ID danh mục (categoryId)
   async findByCategory(categoryId: string): Promise<Exercise[]> {
-    return this.exerciseModel.find({ category: new Types.ObjectId(categoryId) }).exec();
+    const category = new Types.ObjectId(categoryId);
+    return this.exerciseModel
+      .find({
+        category: category,
+      })
+      .populate('category')
+      .exec();
   }
 }

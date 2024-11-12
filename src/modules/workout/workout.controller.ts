@@ -1,10 +1,24 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  UseInterceptors,
+  UploadedFile,
+} from '@nestjs/common';
 import { WorkoutService } from './workout.service';
 import { CreateWorkoutPlanDto } from './dto/create-workout.dto';
 import { ApiBearerAuth, ApiProperty, ApiTags } from '@nestjs/swagger';
-import { TrainerAuth } from '@/shared/guards/trainer-auth.guard';
 import { Trainer } from '@/shared/decorators/trainer.decorator';
 import { GetDetailWorkOutDTO } from './dto/get-detail.workout-dto';
+import { User } from '@/shared/decorators/user.decorator';
+import { JwtAuthGuard } from '@/shared/guards/jwt-auth.guard';
+import { UserService } from '../user/user.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('workout')
 @ApiBearerAuth('jwt')
@@ -12,24 +26,29 @@ import { GetDetailWorkOutDTO } from './dto/get-detail.workout-dto';
 export class WorkoutController {
   constructor(private readonly workoutService: WorkoutService) {}
 
-  @UseGuards(TrainerAuth)
+  // @UseInterceptors(FileInterceptor('file'))
+  @UseGuards(JwtAuthGuard)
   @Post()
-  async create(@Body() createWorkoutDto: CreateWorkoutPlanDto, @Trainer() trainer) {
-    createWorkoutDto.trainerId = trainer._id;
+  async create(
+    @Body() createWorkoutDto: CreateWorkoutPlanDto,
+    @User() user,
+    // @UploadedFile() file?: Express.Multer.File,
+  ) {
+    createWorkoutDto.userId = user._id;
     return await this.workoutService.create(createWorkoutDto);
   }
 
   @Get()
-  findAll() {
-    return this.workoutService.findAll();
+  async findAll() {
+    return await this.workoutService.findAll();
   }
 
   @Get(':id')
-  findOne(
+  async findOne(
     @Param('')
     dto: GetDetailWorkOutDTO,
   ) {
-    return this.workoutService.getWorkoutPlanById(dto.id);
+    return await this.workoutService.findOne(dto.id);
   }
 
   @Delete(':id')

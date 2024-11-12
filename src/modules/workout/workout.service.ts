@@ -1,12 +1,41 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateWorkoutPlanDto } from './dto/create-workout.dto';
 import { WorkoutRepository } from './workout.repository';
 import { Types } from 'mongoose';
+import { UserService } from '../user/user.service';
+import { Role } from '@/schema/enums/role.enum';
+import * as path from 'path';
+import * as fs from 'fs';
+import { CloudinaryService } from '@/shared/services/cloudinary.service';
+import { ExerciseService } from '../exercise/exercise.service';
 
 @Injectable()
 export class WorkoutService {
-  constructor(private readonly workoutRepository: WorkoutRepository) {}
+  private readonly videoUploadPath = path.join(process.cwd(), 'src', 'shared', 'store');
+  constructor(
+    private readonly workoutRepository: WorkoutRepository,
+    private cloudService: CloudinaryService,
+    private userService: UserService,
+    private exService: ExerciseService,
+  ) {
+    if (!fs.existsSync(this.videoUploadPath)) {
+      fs.mkdirSync(this.videoUploadPath, { recursive: true });
+    }
+  }
   async create(createWorkoutDto: CreateWorkoutPlanDto) {
+    const user = await this.userService.findOneById(createWorkoutDto.userId);
+    if (user.role === Role.USER) {
+      createWorkoutDto.isUser = true;
+    }
+    createWorkoutDto.weeklySchedule.forEach((schedule) => {
+      schedule.exercises.forEach((exercise) => {
+        exercise.exerciseId = new Types.ObjectId(exercise.exerciseId);
+      });
+    });
+    createWorkoutDto.goal = new Types.ObjectId(createWorkoutDto.goal);
+    const firstEx = createWorkoutDto.weeklySchedule[0].exercises[0].exerciseId.toString();
+    const foundEx = await this.exService.findOne(firstEx);
+    createWorkoutDto.image = foundEx.gifUrl;
     return await this.workoutRepository.createWorkoutPlan(createWorkoutDto);
   }
 
@@ -21,15 +50,36 @@ export class WorkoutService {
     return workoutPlan;
   }
 
-  findAll() {
-    return `This action returns all workout`;
+  async findAll() {
+    return await this.workoutRepository.findAll();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} workout`;
+  async findOne(id: string) {
+    const newId = new Types.ObjectId(id);
+    return await this.workoutRepository.findById(newId);
   }
 
   remove(id: number) {
     return `This action removes a #${id} workout`;
+  }
+
+  async findWorkOutByGoal(goal: string) {
+    return await this.workoutRepository.findByGoal(goal);
+  }
+
+  async saveVideoToServer(videoFile: Express.Multer.File): Promise<string> {
+    // Generate a file path where the video will be stored
+    const fileName = `${Date.now()}-${videoFile.originalname}`;
+    const filePath = path.join(this.videoUploadPath, fileName);
+
+    // Save the video to the server
+    return new Promise((resolve, reject) => {
+      fs.writeFile(filePath, videoFile.buffer, (err) => {
+        if (err) {
+          reject('Failed to save video');
+        }
+        resolve(filePath);
+      });
+    });
   }
 }

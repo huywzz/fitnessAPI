@@ -14,28 +14,27 @@ import { ExerciseService } from './exercise.service';
 import { CreateExerciseDto } from './dto/create-exercise.dto';
 import { UpdateExerciseDto } from './dto/update-exercise.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { TrainerAuth } from '@/shared/guards/trainer-auth.guard';
-import { Trainer } from '@/shared/decorators/trainer.decorator';
 import { ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from '@/shared/guards/jwt-auth.guard';
+import { User } from '@/shared/decorators/user.decorator';
 
 @ApiTags('exercise')
 @Controller('exercise')
 export class ExerciseController {
-  constructor(private readonly exerciseService: ExerciseService) {}
+  constructor(private readonly exerciseService: ExerciseService) { }
 
-  @UseGuards(TrainerAuth)
   @UseInterceptors(FileInterceptor('file'))
+  @UseGuards(JwtAuthGuard)
   @Post()
   async create(
-    @Trainer() trainer,
+    @User() user,
     @Body() createExerciseDto: CreateExerciseDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    const pathFile =await this.exerciseService.saveVideoToServer(file);
-    console.log(trainer);
-    createExerciseDto.createdBy = trainer._id
+    const pathFile = await this.exerciseService.saveVideoToServer(file);
+    createExerciseDto.createdBy = user._id;
 
-    return this.exerciseService.create(createExerciseDto,pathFile);
+    return this.exerciseService.create(createExerciseDto, pathFile);
   }
 
   @Get()
@@ -44,8 +43,8 @@ export class ExerciseController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.exerciseService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    return await this.exerciseService.findOne(id);
   }
 
   @Patch(':id')
@@ -57,4 +56,5 @@ export class ExerciseController {
   remove(@Param('id') id: string) {
     return this.exerciseService.remove(+id);
   }
+
 }

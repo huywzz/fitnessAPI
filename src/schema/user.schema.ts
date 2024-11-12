@@ -1,9 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 import { BaseSchema } from './base/base.schema';
+import { Role } from './enums/role.enum';
 
 export type UserDocument = HydratedDocument<User>;
-@Schema()
+
 class Profile {
   @Prop()
   age: number;
@@ -33,7 +34,12 @@ class Progress {
   goalWeight: number;
 }
 
-@Schema()
+@Schema({
+  timestamps: {
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
+  },
+})
 export class User extends BaseSchema {
   @Prop()
   fullName: string;
@@ -47,14 +53,30 @@ export class User extends BaseSchema {
   @Prop({ type: Profile })
   profile: Profile;
 
-  @Prop([{ type: Types.ObjectId, ref: 'WorkoutPlan' }])
-  workoutPlans: Types.ObjectId[];
-
-  @Prop({ type: Array, default: [] })
-  completedWorkouts: any[];
-
   @Prop({ type: Progress })
   progress: Progress;
+
+  @Prop({ enum: Role, default: Role.USER })
+  role: Role;
+
+  @Prop({
+    type: [
+      {
+        plan_id: { type: Types.ObjectId, ref: 'WorkoutPlan' },
+        start_date: Date,
+        end_date: Date,
+      },
+    ],
+    default: [],
+  })
+  selectedPlans: Array<{
+    plan_id: { type: Types.ObjectId; ref: 'WorkoutPlan' };
+    start_date: Date;
+    end_date: Date;
+  }>;
+
+  @Prop([{ type: Types.ObjectId, ref: 'WorkoutPlan' }])
+  customPlanIds: Types.ObjectId[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

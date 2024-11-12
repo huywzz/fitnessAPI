@@ -21,7 +21,7 @@ export class GoalController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.goalService.findOne(+id);
+    return this.goalService.findManyById(id);
   }
 
   @Patch(':id')

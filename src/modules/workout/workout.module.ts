@@ -3,17 +3,21 @@ import { WorkoutService } from './workout.service';
 import { WorkoutController } from './workout.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { WorkoutPlan, WorkoutPlanSchema } from '@/schema/workplan.schema';
-import { TrainerModule } from '../trainer/trainer.module';
+// import { TrainerModule } from '../trainer/trainer.module';
 import { WorkoutRepository } from './workout.repository';
 import { JwtService } from '@nestjs/jwt';
+import { UserModule } from '../user/user.module';
+import { CloudinaryService } from '@/shared/services/cloudinary.service';
+import { ExerciseModule } from '../exercise/exercise.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: WorkoutPlan.name, schema: WorkoutPlanSchema }]),
-    TrainerModule,
+    UserModule,
+    ExerciseModule
   ],
   controllers: [WorkoutController],
-  providers: [WorkoutService, WorkoutRepository,JwtService],
+  providers: [WorkoutService, WorkoutRepository,JwtService, CloudinaryService],
   exports: [WorkoutService, WorkoutRepository],
 })
 export class WorkoutModule {}

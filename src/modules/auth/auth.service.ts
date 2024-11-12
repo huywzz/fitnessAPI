@@ -7,7 +7,6 @@ import { JwtService } from '@nestjs/jwt';
 import { ApiConfigService } from '@/shared/services/api-config.service';
 import { LoginSocialDto } from './dto/loginSocial.dto';
 import { firebaseAdmin } from '@/shared/firebase/firebase.config';
-import { TrainerService } from '../trainer/trainer.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { Goal } from '@/schema/goal.schema';
 import { Model } from 'mongoose';
@@ -18,7 +17,6 @@ export class AuthService {
     @InjectModel(Goal.name) private goalModel: Model<Goal>,
     @InjectModel(Category.name) private cateModel: Model<Category>,
     private readonly userService: UserService,
-    private readonly trainerService: TrainerService,
     private jwtService: JwtService,
     private readonly configService: ApiConfigService,
   ) {}
@@ -39,10 +37,7 @@ export class AuthService {
     return user;
   }
 
-  async signTrainer(signUpEmailDto: SignUpEmailDto) {
-    const user = await this.trainerService.create(signUpEmailDto.email, signUpEmailDto.password);
-    return user;
-  }
+ 
 
   async loginByEmail(dto: LoginEmailDto) {
     const { email, password } = dto;
@@ -85,18 +80,5 @@ export class AuthService {
     };
   }
 
-  async loginTrainer(dto: LoginEmailDto) {
-    const { email, password } = dto;
-    const foundTrainer = await this.trainerService.findOneByEmailOrThrow(email);
-
-    if (foundTrainer.password !== password) {
-      throw new BadRequestException('Email or password is wrong');
-    }
-    const token = this.getAccessToken(foundTrainer._id, email);
-
-    return {
-      accessToken: token,
-      email: foundTrainer.email,
-    };
-  }
+  
 }

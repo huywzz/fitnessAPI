@@ -87,4 +87,10 @@ export class UserService {
     found.profile.goal = obj._id
     return await this.userRepository.updateOne(found);
   }
+
+  async findOneById(id: any) {
+    return this.userRepository.findOneUser({
+      _id: id,
+    });
+  }
 }

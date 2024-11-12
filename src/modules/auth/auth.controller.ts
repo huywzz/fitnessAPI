@@ -34,13 +34,5 @@ export class AuthController {
     return await this.authService.loginSocial(dto);
   }
 
-  @Post('/sign-up-trainer')
-  async signUpByTrainer(@Body() dto: SignUpEmailDto) {
-    return await this.authService.signTrainer(dto);
-  }
-
-  @Post('/login-trainer')
-  async loginTrainer(@Body() dto: LoginEmailDto) {
-    return await this.authService.loginTrainer(dto)
-  }
+  
 }

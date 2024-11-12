@@ -5,7 +5,12 @@ import { HydratedDocument, Types } from 'mongoose';
 
 export type GoalDocument = HydratedDocument<Goal>;
 
-@Schema()
+@Schema({
+  timestamps: {
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
+  },
+})
 export class Goal extends BaseSchema {
   @Prop({ required: true })
   title: string;

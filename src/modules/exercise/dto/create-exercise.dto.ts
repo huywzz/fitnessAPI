@@ -10,8 +10,8 @@ export class CreateExerciseDto {
   @IsString()
   gifUrl?: string;
 
-  @IsString({ each: true })
-  steps: string[];
+  @IsString()
+  steps: string;
 
   @IsNotEmpty()
   @IsString()

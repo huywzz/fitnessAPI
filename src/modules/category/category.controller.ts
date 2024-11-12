@@ -34,9 +34,10 @@ export class CategoryController {
     return this.categoryService.findAll();
   }
 
+  @ApiOperation({ summary: 'list ex by category' })
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.categoryService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    return await this.categoryService.findByCategory(id);
   }
 
   @Patch(':id')

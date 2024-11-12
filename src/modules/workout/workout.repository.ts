@@ -1,7 +1,7 @@
-import { WorkoutPlan } from "@/schema/workplan.schema";
-import { InjectModel } from "@nestjs/mongoose";
-import { Model, Types } from "mongoose";
-import { CreateWorkoutPlanDto } from "./dto/create-workout.dto";
+import { WorkoutPlan } from '@/schema/workplan.schema';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, Types } from 'mongoose';
+import { CreateWorkoutPlanDto } from './dto/create-workout.dto';
 
 export class WorkoutRepository {
   constructor(@InjectModel(WorkoutPlan.name) private workOutModel: Model<WorkoutPlan>) {}
@@ -12,7 +12,9 @@ export class WorkoutRepository {
   }
 
   async findById(id: Types.ObjectId): Promise<WorkoutPlan | null> {
-    return this.workOutModel.findById(id).exec();
+    return this.workOutModel.findById(id).populate({
+      path: 'weeklySchedule.exercises.exerciseId'
+    }).exec();
   }
 
   async findAll(): Promise<WorkoutPlan[]> {
@@ -29,5 +31,19 @@ export class WorkoutRepository {
       })
       .populate('category', 'name description') // Populate category details
       .exec(); // Execute the query with exec()
+  }
+
+  async findByGoal(goal: string) {
+    const id = new Types.ObjectId(goal);
+    return this.workOutModel
+      .find({
+        goal: id,
+      })
+      .select({
+        difficulty: true,
+        image: true,
+        title: true,
+        description:true
+      });
   }
 }

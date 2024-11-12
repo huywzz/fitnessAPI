@@ -11,7 +11,6 @@ import { ResponseInterceptor } from './shared/interceptors/response.interceptor'
 import { SharedModule } from './shared/shared.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserModule } from './modules/user/user.module';
-import { TrainerModule } from './modules/trainer/trainer.module';
 import { GoalModule } from './modules/goal/goal.module';
 import { ExerciseModule } from './modules/exercise/exercise.module';
 import { WorkoutModule } from './modules/workout/workout.module';
@@ -32,7 +31,6 @@ import { CategoryModule } from './modules/category/category.module';
     SharedModule,
     AuthModule,
     UserModule,
-    TrainerModule,
     GoalModule,
     ExerciseModule,
     WorkoutModule,

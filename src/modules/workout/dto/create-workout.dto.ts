@@ -1,175 +1,153 @@
+import { BMI } from '@/schema/enums/bmi.enum';
 import { Difficulty } from '@/schema/enums/difficulty.enum';
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
 import {
-  IsMongoId,
-  IsNumber,
-  IsString,
-  IsEnum,
   IsArray,
-  ValidateNested,
+  IsEnum,
+  IsMongoId,
+  IsNotEmpty,
+  IsNumber,
   IsOptional,
+  IsString,
+  MaxLength,
+  Min,
 } from 'class-validator';
 import { Types } from 'mongoose';
 
-
-class CreateExerciseDetailDto {
-  @ApiProperty({
-    example: '6727b08fbd1dc47908d17eef',
-    description: 'ID của bài tập',
-  })
+// DTO cho ExerciseDetail
+export class ExerciseDetailDto {
   @IsMongoId()
+  @IsNotEmpty()
   exerciseId: Types.ObjectId;
 
-  @ApiProperty({
-    example: 15,
-    description: 'Số lần thực hiện mỗi set',
-  })
   @IsNumber()
+  @Min(1)
   reps: number;
 
-  @ApiProperty({
-    example: 4,
-    description: 'Số set thực hiện',
-  })
   @IsNumber()
+  @Min(1)
   sets: number;
-
-  @ApiProperty({
-    example: 50,
-    description: 'Lượng calo đốt cháy mỗi set',
-  })
-  @IsNumber()
-  calorBySet: number;
 }
 
-class CreateScheduleDto {
+// DTO cho Schedule
+export class ScheduleDto {
   @ApiProperty({
-    example: 'Full Body Workout',
-    description: 'Tiêu đề của lịch trình ngày hôm đó',
+    description: 'Tên ngày tập',
+    example: 'Bụng + vai',
   })
   @IsString()
+  @IsNotEmpty()
+  @MaxLength(100)
   title: string;
 
   @ApiProperty({
-    example: 'Monday',
-    description: 'Ngày trong tuần của lịch tập luyện',
+    description: 'Ngày tập thứ mấy',
+    example: '1',
   })
-  @IsString()
-  day: string;
+  @IsNumber()
+  @Min(1)
+  day: number;
 
   @ApiProperty({
+    description: 'Danh sách bài tập cho ngày tập luyện',
+    type: [ExerciseDetailDto],
     example: [
       {
-        exerciseId: '6727b08fbd1dc47908d17eef',
-        reps: 15,
+        exerciseId: '673341d2af810e16b2cfd502',
+        reps: 12,
+        sets: 3,
+      },
+      {
+        exerciseId: '673342c8af810e16b2cfd506',
+        reps: 10,
         sets: 4,
-        calorBySet: 50,
+      },
+      {
+        exerciseId: '673342feaf810e16b2cfd50e',
+        reps: 10,
+        sets: 4,
       },
     ],
-    description: 'Danh sách các bài tập chi tiết trong ngày',
-    type: [CreateExerciseDetailDto],
   })
   @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => CreateExerciseDetailDto)
-  exercises: CreateExerciseDetailDto[];
+  exercises: ExerciseDetailDto[];
 }
 
+// DTO cho CreateWorkoutPlan
 export class CreateWorkoutPlanDto {
   @ApiProperty({
-    example: 'Muscle Building Plan',
-    description: 'Tiêu đề của kế hoạch tập luyện',
+    description: 'Tên của kế hoạch tập luyện',
+    example: 'Beginner Full Body Workout',
   })
   @IsString()
+  @IsNotEmpty()
+  @MaxLength(100)
   title: string;
 
-  @IsMongoId()
   @IsOptional()
-  trainerId: Types.ObjectId;
+  @IsString()
+  image?: string;
+
+
+  @IsOptional()
+  userId?: string;
 
   @ApiProperty({
-    example: Difficulty.HARD,
-    description: 'Mức độ khó của kế hoạch',
+    description: 'Độ khó của kế hoạch tập luyện',
     enum: Difficulty,
+    example: Difficulty.BEGINNER,
   })
   @IsEnum(Difficulty)
   difficulty: Difficulty;
 
   @ApiProperty({
-    example: 5,
-    description: 'Số ngày tập luyện mỗi tuần',
+    description: 'Số ngày tập trong một tuần',
+    example: 3,
   })
   @IsNumber()
+  @Min(1)
   daysPerWeek: number;
 
   @ApiProperty({
-    example: [
-      {
-        title: 'Full Body Workout',
-        day: 'Monday',
-        exercises: [
-          {
-            exerciseId: '6727b08fbd1dc47908d17eef',
-            reps: 15,
-            sets: 4,
-            calorBySet: 50,
-          },
-          {
-            exerciseId: '6727b156c8eadffbebb3bb15',
-            reps: 15,
-            sets: 6,
-            calorBySet: 50,
-          },
-        ],
-      },
-      {
-        title: 'Boxing',
-        day: 'Tuesday',
-        exercises: [
-          {
-            exerciseId: '6727b08fbd1dc47908d17eef',
-            reps: 15,
-            sets: 2,
-            calorBySet: 50,
-          },
-          {
-            exerciseId: '6727b17cc8eadffbebb3bb18',
-            reps: 15,
-            sets: 1,
-            calorBySet: 50,
-          },
-        ],
-      },
-    ],
-    description: 'Lịch trình tập luyện hàng tuần',
-    type: [CreateScheduleDto],
+    description: 'Lịch tập trong tuần',
+    type: [ScheduleDto],
   })
   @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => CreateScheduleDto)
-  weeklySchedule: CreateScheduleDto[];
+  weeklySchedule: ScheduleDto[];
+
+  @IsOptional()
+  @IsArray()
+  @IsMongoId({ each: true })
+  userIds?: Types.ObjectId[];
 
   @ApiProperty({
-    example: '6727a729324b4fe5e64c91b4',
-    description: 'ID của danh mục kế hoạch tập luyện',
+    description: 'ID của mục tiêu kế hoạch tập luyện',
+    example: '64c8b2d1e83d8a10fcd4e20c',
+    required: false,
   })
+  @IsOptional()
   @IsMongoId()
-  category: Types.ObjectId;
+  goal?: Types.ObjectId;
 
   @ApiProperty({
-    example: 'Fitness Center Downtown',
-    description: 'Địa điểm tập luyện',
+    description: 'BMI là bao nhiêu để được rcm plan này',
+    example: 1,
+    required: false,
   })
-  @IsString()
-  location: string;
+  @IsOptional()
+  @IsEnum(BMI)
+  bmi?: BMI;
 
   @ApiProperty({
-    example: 'Chương trình tập luyện giúp bạn đạt được mục tiêu xây dựng cơ bắp hiệu quả.',
-    description: 'Mô tả ngắn gọn về kế hoạch tập luyện',
+    description: 'Mô tả về kế hoạch tập luyện',
+    example: 'A comprehensive workout plan for beginners.',
     required: false,
   })
   @IsOptional()
   @IsString()
+  @MaxLength(500)
   description?: string;
+
+  @IsOptional()
+  isUser: boolean;
 }
