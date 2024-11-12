@@ -33,7 +33,7 @@ export class ExerciseService {
   }
 
   async findByCategory(categoryId: string) {
-    return await this.exRepository.findByCategory(categoryId)
+    return await this.exRepository.findByCategory(categoryId);
   }
 
   findAll() {

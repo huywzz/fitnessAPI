@@ -2,7 +2,6 @@ import { BaseSchema } from './base/base.schema';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 
-
 export type GoalDocument = HydratedDocument<Goal>;
 
 @Schema({

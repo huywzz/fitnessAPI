@@ -14,15 +14,16 @@ import { ExerciseService } from './exercise.service';
 import { CreateExerciseDto } from './dto/create-exercise.dto';
 import { UpdateExerciseDto } from './dto/update-exercise.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '@/shared/guards/jwt-auth.guard';
 import { User } from '@/shared/decorators/user.decorator';
 
 @ApiTags('exercise')
 @Controller('exercise')
 export class ExerciseController {
-  constructor(private readonly exerciseService: ExerciseService) { }
+  constructor(private readonly exerciseService: ExerciseService) {}
 
+  @ApiOperation({ summary: 'create ex' })
   @UseInterceptors(FileInterceptor('file'))
   @UseGuards(JwtAuthGuard)
   @Post()
@@ -41,7 +42,7 @@ export class ExerciseController {
   findAll() {
     return this.exerciseService.findAll();
   }
-
+  @ApiOperation({ summary: 'detail ex' })
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return await this.exerciseService.findOne(id);
@@ -56,5 +57,4 @@ export class ExerciseController {
   remove(@Param('id') id: string) {
     return this.exerciseService.remove(+id);
   }
-
 }

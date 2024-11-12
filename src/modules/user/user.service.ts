@@ -72,19 +72,19 @@ export class UserService {
       },
       id,
     );
-    const convertToM=dto.height/100
-    const bmi = dto.weight / (convertToM*convertToM)
+    const convertToM = dto.height / 100;
+    const bmi = dto.weight / (convertToM * convertToM);
 
     return {
       updateUser,
-      bmi
-    }
+      bmi,
+    };
   }
 
   async updateGoal(dto: UpdateGoalDTO, id) {
     const found = await this.findOneOrThrowById(id);
     const obj = new Types.ObjectId(dto.goal);
-    found.profile.goal = obj._id
+    found.profile.goal = obj._id;
     return await this.userRepository.updateOne(found);
   }
 

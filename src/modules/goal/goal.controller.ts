@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { GoalService } from './goal.service';
 import { CreateGoalDto } from './dto/create-goal.dto';
 import { UpdateGoalDto } from './dto/update-goal.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('goal')
 @Controller('goal')
@@ -18,10 +18,10 @@ export class GoalController {
   findAll() {
     return this.goalService.findAll();
   }
-
+  @ApiOperation({ summary: 'get workplan by goal' })
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.goalService.findManyById(id);
+  async findOne(@Param('id') id: string) {
+    return await this.goalService.findManyById(id);
   }
 
   @Patch(':id')

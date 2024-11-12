@@ -88,7 +88,6 @@ export class CreateWorkoutPlanDto {
   @IsString()
   image?: string;
 
-
   @IsOptional()
   userId?: string;
 

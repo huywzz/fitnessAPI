@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { WorkoutService } from './workout.service';
 import { CreateWorkoutPlanDto } from './dto/create-workout.dto';
-import { ApiBearerAuth, ApiProperty, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiProperty, ApiTags } from '@nestjs/swagger';
 import { Trainer } from '@/shared/decorators/trainer.decorator';
 import { GetDetailWorkOutDTO } from './dto/get-detail.workout-dto';
 import { User } from '@/shared/decorators/user.decorator';
@@ -26,6 +26,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class WorkoutController {
   constructor(private readonly workoutService: WorkoutService) {}
 
+  @ApiOperation({ summary: 'create workout plan' })
   // @UseInterceptors(FileInterceptor('file'))
   @UseGuards(JwtAuthGuard)
   @Post()
@@ -43,6 +44,7 @@ export class WorkoutController {
     return await this.workoutService.findAll();
   }
 
+  @ApiOperation({ summary: 'detail workout plan' })
   @Get(':id')
   async findOne(
     @Param('')

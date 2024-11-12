@@ -10,9 +10,7 @@ export class CloudinaryService {
   private readonly apiSecret: string;
   private readonly apiUrl: string;
 
-  constructor(
-    private readonly configService: ApiConfigService,
-  ) {
+  constructor(private readonly configService: ApiConfigService) {
     const { cloudName, apiKey, apiSecret, apiUrl } = this.configService.cloudinaryConfig;
     this.cloudName = cloudName;
     this.apiKey = apiKey;
@@ -30,7 +28,7 @@ export class CloudinaryService {
   async uploadImage(file: string) {
     try {
       const result = await cloudinary.uploader.upload(file, {
-        folder: 'gif', 
+        folder: 'gif',
       });
       return {
         publicId: result.public_id,
@@ -38,7 +36,7 @@ export class CloudinaryService {
       };
     } catch (error) {
       throw new BadRequestException({
-        message: 'Upload failed'
+        message: 'Upload failed',
       });
     }
   }

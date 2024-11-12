@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SignUpEmailDto } from './dto/signUpEmail.dto';
 import { LoginEmailDto } from './dto/loginEmail.dto';
 import { JwtAuthGuard } from '@/shared/guards/jwt-auth.guard';
@@ -16,14 +16,16 @@ export class AuthController {
   @Get()
   @UseGuards(JwtAuthGuard)
   async hello(@User() user) {
-    return await this.authService.test()
+    return await this.authService.test();
   }
 
+  @ApiOperation({ summary: 'sign up' })
   @Post('/sign-up')
   async signUpByEmail(@Body() dto: SignUpEmailDto) {
     return await this.authService.signUpEmail(dto);
   }
 
+  @ApiOperation({ summary: 'login' })
   @Post('/login')
   async loginByEmail(@Body() dto: LoginEmailDto) {
     return await this.authService.loginByEmail(dto);
@@ -33,6 +35,4 @@ export class AuthController {
   async loginBySocial(@Body() dto: LoginSocialDto) {
     return await this.authService.loginSocial(dto);
   }
-
-  
 }

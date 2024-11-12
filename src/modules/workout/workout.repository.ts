@@ -12,9 +12,12 @@ export class WorkoutRepository {
   }
 
   async findById(id: Types.ObjectId): Promise<WorkoutPlan | null> {
-    return this.workOutModel.findById(id).populate({
-      path: 'weeklySchedule.exercises.exerciseId'
-    }).exec();
+    return this.workOutModel
+      .findById(id)
+      .populate({
+        path: 'weeklySchedule.exercises.exerciseId',
+      })
+      .exec();
   }
 
   async findAll(): Promise<WorkoutPlan[]> {
@@ -43,7 +46,7 @@ export class WorkoutRepository {
         difficulty: true,
         image: true,
         title: true,
-        description:true
+        description: true,
       });
   }
 }

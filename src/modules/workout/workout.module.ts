@@ -14,10 +14,10 @@ import { ExerciseModule } from '../exercise/exercise.module';
   imports: [
     MongooseModule.forFeature([{ name: WorkoutPlan.name, schema: WorkoutPlanSchema }]),
     UserModule,
-    ExerciseModule
+    ExerciseModule,
   ],
   controllers: [WorkoutController],
-  providers: [WorkoutService, WorkoutRepository,JwtService, CloudinaryService],
+  providers: [WorkoutService, WorkoutRepository, JwtService, CloudinaryService],
   exports: [WorkoutService, WorkoutRepository],
 })
 export class WorkoutModule {}

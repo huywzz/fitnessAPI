@@ -8,17 +8,16 @@ export class Token extends BaseSchema {
   userId: Types.ObjectId;
 
   @Prop({ required: true })
-  token: string; 
+  token: string;
 
   @Prop()
-  refreshToken: string; 
+  refreshToken: string;
 
   @Prop()
-  deviceInfo: string; 
+  deviceInfo: string;
 
   @Prop({ default: false })
-  isRevoked: boolean; 
-
+  isRevoked: boolean;
 }
 
 export const TokenSchema = SchemaFactory.createForClass(Token);

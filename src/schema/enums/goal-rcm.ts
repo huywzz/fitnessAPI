@@ -1,4 +1,4 @@
-export enum GoalRecommend{
-    ABS = 1,
-    LosingWeight=2
+export enum GoalRecommend {
+  ABS = 1,
+  LosingWeight = 2,
 }

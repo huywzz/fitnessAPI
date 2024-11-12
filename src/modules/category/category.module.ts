@@ -7,7 +7,7 @@ import { CloudinaryService } from '@/shared/services/cloudinary.service';
 import { ExerciseModule } from '../exercise/exercise.module';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: Category.name, schema: CategorySchema }]),ExerciseModule],
+  imports: [MongooseModule.forFeature([{ name: Category.name, schema: CategorySchema }]), ExerciseModule],
   controllers: [CategoryController],
   providers: [CategoryService, CloudinaryService],
   exports: [CategoryService],

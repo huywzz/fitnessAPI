@@ -37,8 +37,6 @@ export class AuthService {
     return user;
   }
 
- 
-
   async loginByEmail(dto: LoginEmailDto) {
     const { email, password } = dto;
     const foundUser = await this.userService.findOneOrThrowByEmail(email);
@@ -79,6 +77,4 @@ export class AuthService {
       email: user.email,
     };
   }
-
-  
 }

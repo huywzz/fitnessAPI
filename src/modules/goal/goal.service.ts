@@ -33,6 +33,6 @@ export class GoalService {
   }
 
   async findManyById(id: string) {
-    return await this.workoutService.findWorkOutByGoal(id)
+    return await this.workoutService.findWorkOutByGoal(id);
   }
 }

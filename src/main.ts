@@ -29,8 +29,7 @@ async function bootstrap() {
     }),
   );
 
-  app.useGlobalFilters(
-  );
+  app.useGlobalFilters();
 
   await app.listen(port);
 

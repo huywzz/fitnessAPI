@@ -9,6 +9,6 @@ import { WorkoutModule } from '../workout/workout.module';
   imports: [MongooseModule.forFeature([{ name: Goal.name, schema: GoalSchema }]), WorkoutModule],
   controllers: [GoalController],
   providers: [GoalService],
-  exports:[GoalService]
+  exports: [GoalService],
 })
 export class GoalModule {}

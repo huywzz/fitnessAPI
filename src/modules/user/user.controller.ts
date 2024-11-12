@@ -34,7 +34,7 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Patch('/update-goal')
-  updateGoal(@User() user, @Body() dto:UpdateGoalDTO) {
+  updateGoal(@User() user, @Body() dto: UpdateGoalDTO) {
     return this.userService.updateGoal(dto, user._id);
   }
 

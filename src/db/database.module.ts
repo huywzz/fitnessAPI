@@ -3,7 +3,6 @@ import { SharedModule } from '@/shared/shared.module';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
-
 @Module({
   imports: [
     MongooseModule.forRootAsync({
