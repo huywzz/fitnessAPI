@@ -21,7 +21,18 @@ export class WorkoutRepository {
   }
 
   async findAll(): Promise<WorkoutPlan[]> {
-    return this.workOutModel.find().exec();
+    return this.workOutModel
+      .find()
+      .select({
+        title: true,
+        image: true,
+        difficulty: true,
+      })
+      .sort({
+        created_at: 1,
+      })
+      .limit(5)
+      .exec();
   }
 
   async findByIdWithDetails(id: Types.ObjectId): Promise<WorkoutPlan> {

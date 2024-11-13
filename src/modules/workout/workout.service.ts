@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateWorkoutPlanDto } from './dto/create-workout.dto';
 import { WorkoutRepository } from './workout.repository';
 import { Types } from 'mongoose';
@@ -8,6 +8,8 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { CloudinaryService } from '@/shared/services/cloudinary.service';
 import { ExerciseService } from '../exercise/exercise.service';
+import { RegisterWorkoutDTO } from './dto/register-workout.dto';
+import { LogWorkoutService } from '../log-workout/log-workout.service';
 
 @Injectable()
 export class WorkoutService {
@@ -17,6 +19,8 @@ export class WorkoutService {
     private cloudService: CloudinaryService,
     private userService: UserService,
     private exService: ExerciseService,
+    @Inject(forwardRef(()=>LogWorkoutService))
+    private logService:LogWorkoutService,
   ) {
     if (!fs.existsSync(this.videoUploadPath)) {
       fs.mkdirSync(this.videoUploadPath, { recursive: true });
@@ -65,6 +69,11 @@ export class WorkoutService {
 
   async findWorkOutByGoal(goal: string) {
     return await this.workoutRepository.findByGoal(goal);
+  }
+
+  async registerPlan(dto: RegisterWorkoutDTO,userId:string) {
+    const result = await this.logService.create(userId, dto.planId)
+    return result
   }
 
   async saveVideoToServer(videoFile: Express.Multer.File): Promise<string> {

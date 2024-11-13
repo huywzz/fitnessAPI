@@ -19,6 +19,7 @@ import { User } from '@/shared/decorators/user.decorator';
 import { JwtAuthGuard } from '@/shared/guards/jwt-auth.guard';
 import { UserService } from '../user/user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { RegisterWorkoutDTO } from './dto/register-workout.dto';
 
 @ApiTags('workout')
 @ApiBearerAuth('jwt')
@@ -38,7 +39,7 @@ export class WorkoutController {
     createWorkoutDto.userId = user._id;
     return await this.workoutService.create(createWorkoutDto);
   }
-
+  @ApiOperation({ summary: 'get all workout plan' })
   @Get()
   async findAll() {
     return await this.workoutService.findAll();
@@ -56,5 +57,12 @@ export class WorkoutController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.workoutService.remove(+id);
+  }
+
+  @ApiOperation({ summary: 'User đăng kí workout plan' })
+  @UseGuards(JwtAuthGuard)
+  @Post('register-plan')
+  async registerPlan(@Body() dto: RegisterWorkoutDTO, @User() user) {
+    return await this.workoutService.registerPlan(dto, user._id.toString());
   }
 }

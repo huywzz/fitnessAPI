@@ -67,6 +67,12 @@ export class WorkoutPlan extends BaseSchema {
 
   @Prop({ default: false })
   isUser: boolean;
+
+  @Prop({ type: Number })
+  cycle: number;
+
+  @Prop({ type: Number })
+  totalDayOfPlan:number
 }
 
 export const WorkoutPlanSchema = SchemaFactory.createForClass(WorkoutPlan);
