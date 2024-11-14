@@ -15,7 +15,7 @@ import { WorkoutModule } from '../workout/workout.module';
     // WorkoutModule,
   ],
   controllers: [LogWorkoutController],
-  providers: [LogWorkoutService,JwtService],
+  providers: [LogWorkoutService,JwtService,],
   exports: [LogWorkoutService],
 })
 export class LogWorkoutModule {}

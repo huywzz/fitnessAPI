@@ -1,23 +1,37 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseInterceptors,
+  UploadedFile,
+} from '@nestjs/common';
 import { GoalService } from './goal.service';
 import { CreateGoalDto } from './dto/create-goal.dto';
 import { UpdateGoalDto } from './dto/update-goal.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('goal')
 @Controller('goal')
 export class GoalController {
   constructor(private readonly goalService: GoalService) {}
 
+  @UseInterceptors(FileInterceptor('file'))
   @Post()
-  create(@Body() createGoalDto: CreateGoalDto) {
-    return this.goalService.create(createGoalDto);
+  async create(@Body() createGoalDto: CreateGoalDto, @UploadedFile() file: Express.Multer.File) {
+    const pathFile = await this.goalService.saveVideoToServer(file);
+    return await this.goalService.create(createGoalDto, pathFile);
   }
 
   @Get()
-  findAll() {
-    return this.goalService.findAll();
+  async findAll() {
+    return await this.goalService.findAll();
   }
+
   @ApiOperation({ summary: 'get workplan by goal' })
   @Get(':id')
   async findOne(@Param('id') id: string) {

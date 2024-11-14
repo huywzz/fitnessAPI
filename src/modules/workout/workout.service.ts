@@ -10,6 +10,7 @@ import { CloudinaryService } from '@/shared/services/cloudinary.service';
 import { ExerciseService } from '../exercise/exercise.service';
 import { RegisterWorkoutDTO } from './dto/register-workout.dto';
 import { LogWorkoutService } from '../log-workout/log-workout.service';
+import { Difficulty } from '@/schema/enums/difficulty.enum';
 
 @Injectable()
 export class WorkoutService {
@@ -19,8 +20,8 @@ export class WorkoutService {
     private cloudService: CloudinaryService,
     private userService: UserService,
     private exService: ExerciseService,
-    @Inject(forwardRef(()=>LogWorkoutService))
-    private logService:LogWorkoutService,
+    @Inject(forwardRef(() => LogWorkoutService))
+    private logService: LogWorkoutService,
   ) {
     if (!fs.existsSync(this.videoUploadPath)) {
       fs.mkdirSync(this.videoUploadPath, { recursive: true });
@@ -71,9 +72,29 @@ export class WorkoutService {
     return await this.workoutRepository.findByGoal(goal);
   }
 
-  async registerPlan(dto: RegisterWorkoutDTO,userId:string) {
-    const result = await this.logService.create(userId, dto.planId)
-    return result
+  async findByQuery(goal?: string, difficulty?: Difficulty) {
+    let obj: any = {};
+
+    // Kiểm tra giá trị goal có hợp lệ không
+    if (goal && Types.ObjectId.isValid(goal)) {
+      const goalId = new Types.ObjectId(goal);
+      obj.goal = goalId;
+    } else if (goal) {
+      console.error('Invalid goal ObjectId:', goal);
+      throw new Error('Invalid goal ObjectId format');
+    }
+
+    if (difficulty) {
+      obj.difficulty = difficulty;
+    }
+
+    console.log(obj);
+    return await this.workoutRepository.findByQuery(obj);
+  }
+
+  async registerPlan(dto: RegisterWorkoutDTO, userId: string) {
+    const result = await this.logService.create(userId, dto.planId);
+    return result;
   }
 
   async saveVideoToServer(videoFile: Express.Multer.File): Promise<string> {

@@ -7,6 +7,7 @@ import { JwtAuthGuard } from '@/shared/guards/jwt-auth.guard';
 import { User } from '@/shared/decorators/user.decorator';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { DayDetailDTO } from './dto/day-detail.dto';
+import { UpdateExerciseCompleteDTO } from './dto/update-ex-log.dto';
 
 @ApiTags('Log workout')
 @ApiBearerAuth('jwt')
@@ -47,5 +48,10 @@ export class LogWorkoutController {
     return await this.logWorkoutService.dayDetail(dto, user._id);
   }
 
-  // @Post('register')
+  @ApiOperation({ summary: 'update complete ex' })
+  @UseGuards(JwtAuthGuard)
+  @Post('complete-excicrise')
+  async complateEx(@Body() dto: UpdateExerciseCompleteDTO, @User() user) {
+    return await this.logWorkoutService.updateExerciseComplete(dto.workoutLogId, dto.dayNumber,dto.exerciseIndex);
+  }
 }

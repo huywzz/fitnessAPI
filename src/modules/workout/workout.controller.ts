@@ -9,6 +9,7 @@ import {
   UseGuards,
   UseInterceptors,
   UploadedFile,
+  Query,
 } from '@nestjs/common';
 import { WorkoutService } from './workout.service';
 import { CreateWorkoutPlanDto } from './dto/create-workout.dto';
@@ -20,6 +21,8 @@ import { JwtAuthGuard } from '@/shared/guards/jwt-auth.guard';
 import { UserService } from '../user/user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { RegisterWorkoutDTO } from './dto/register-workout.dto';
+import { Difficulty } from '@/schema/enums/difficulty.enum';
+import { QueryWorkoutDTO } from './dto/query-workout.dto';
 
 @ApiTags('workout')
 @ApiBearerAuth('jwt')
@@ -39,6 +42,15 @@ export class WorkoutController {
     createWorkoutDto.userId = user._id;
     return await this.workoutService.create(createWorkoutDto);
   }
+  
+  @ApiOperation({ summary: 'find workout plan' })
+  @Get('/find')
+  async findByQuery(@Query() dto: QueryWorkoutDTO) {
+    console.log(dto);
+
+    return await this.workoutService.findByQuery(dto.goal, dto.difficulty);
+  }
+
   @ApiOperation({ summary: 'get all workout plan' })
   @Get()
   async findAll() {

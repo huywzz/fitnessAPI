@@ -2,6 +2,7 @@ import { WorkoutPlan } from '@/schema/workplan.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { CreateWorkoutPlanDto } from './dto/create-workout.dto';
+import { Difficulty } from '@/schema/enums/difficulty.enum';
 
 export class WorkoutRepository {
   constructor(@InjectModel(WorkoutPlan.name) private workOutModel: Model<WorkoutPlan>) {}
@@ -59,5 +60,16 @@ export class WorkoutRepository {
         title: true,
         description: true,
       });
+  }
+
+  async findByQuery(obj:{}) {
+    return await this.workOutModel
+      .find(obj)
+      .select({
+        title: true,
+        image: true,
+        difficulty: true,
+      })
+      .exec();
   }
 }

@@ -89,7 +89,6 @@ export class LogWorkoutService {
       throw new NotFoundException('Log workout not found');
     }
 
-
     const day = result.days.find((day) => day.dayNumber === +dto.numberDay);
 
     if (!day) {
@@ -97,8 +96,42 @@ export class LogWorkoutService {
     }
 
     return {
+      id: result._id,
       day,
     };
   }
-  
+
+  async updateExerciseComplete(
+    workoutLogId: string,
+    dayNumber: number,
+    exerciseIndex: number,
+  ): Promise<WorkoutLog> {
+    // Tìm WorkoutLog theo ID
+    const id = convertObjectId(workoutLogId);
+    const workoutLog = await this.logModel.findById(id).exec();
+
+    if (!workoutLog) {
+      throw new Error('WorkoutLog not found');
+    }
+
+    // Tìm DayLog theo dayNumber
+    const dayLog = workoutLog.days.find((day) => day.dayNumber === dayNumber);
+    if (!dayLog) {
+      throw new Error('DayLog not found');
+    }
+
+    // Tìm ExerciseLog theo index trong mảng exercises
+    const exerciseLog = dayLog.exercises[exerciseIndex];
+    if (!exerciseLog) {
+      throw new Error('ExerciseLog not found');
+    }
+
+    // Cập nhật trường isComplete thành true
+    exerciseLog.isComplete = true;
+
+    // Lưu lại WorkoutLog với thay đổi
+    await workoutLog.save();
+
+    return workoutLog;
+  }
 }
