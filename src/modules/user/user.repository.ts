@@ -39,4 +39,8 @@ export class UserRepository {
   async updateOne(user: User) {
     return await user.save();
   }
+
+  async findAll() {
+    return await this.userModel.find()
+  }
 }

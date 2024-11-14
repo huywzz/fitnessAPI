@@ -25,8 +25,8 @@ export class UserService {
     return await this.userRepository.createBySocial(email, name);
   }
 
-  findAll() {
-    return `This action returns all user`;
+  async findAll() {
+    return this.userRepository.findAll()
   }
 
   async findOneOrThrowById(id: any) {
