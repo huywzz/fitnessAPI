@@ -16,6 +16,9 @@ export class Exercise extends BaseSchema {
   @Prop()
   gifUrl: string;
 
+  @Prop()
+  thumbnail:string
+
   @Prop({ maxlength: 500 })
   steps: string;
 

@@ -10,6 +10,10 @@ export class CreateExerciseDto {
   @IsString()
   gifUrl?: string;
 
+  @IsOptional()
+  @IsString()
+  thumbnail?: string;
+
   @IsString()
   steps: string;
 

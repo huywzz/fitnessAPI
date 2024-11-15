@@ -40,7 +40,7 @@ export class WorkoutService {
     createWorkoutDto.goal = new Types.ObjectId(createWorkoutDto.goal);
     const firstEx = createWorkoutDto.weeklySchedule[0].exercises[0].exerciseId.toString();
     const foundEx = await this.exService.findOne(firstEx);
-    createWorkoutDto.image = foundEx.gifUrl;
+    createWorkoutDto.image = foundEx.thumbnail;
     return await this.workoutRepository.createWorkoutPlan(createWorkoutDto);
   }
 

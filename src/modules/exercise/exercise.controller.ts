@@ -9,14 +9,17 @@ import {
   UseInterceptors,
   UploadedFile,
   UseGuards,
+  UploadedFiles,
 } from '@nestjs/common';
 import { ExerciseService } from './exercise.service';
 import { CreateExerciseDto } from './dto/create-exercise.dto';
 import { UpdateExerciseDto } from './dto/update-exercise.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '@/shared/guards/jwt-auth.guard';
 import { User } from '@/shared/decorators/user.decorator';
+
+import sharp from 'sharp';
 
 @ApiTags('exercise')
 @Controller('exercise')
@@ -24,18 +27,26 @@ export class ExerciseController {
   constructor(private readonly exerciseService: ExerciseService) {}
 
   @ApiOperation({ summary: 'create ex' })
-  @UseInterceptors(FileInterceptor('file'))
+  // @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'file', maxCount: 1 },
+      { name: 'thumbnail', maxCount: 1 },
+    ]),
+  )
   @UseGuards(JwtAuthGuard)
   @Post()
   async create(
     @User() user,
     @Body() createExerciseDto: CreateExerciseDto,
-    @UploadedFile() file: Express.Multer.File,
+    // @UploadedFile() file: Express.Multer.File,
+    @UploadedFiles() obj: { file?: Express.Multer.File[]; thumbnail?: Express.Multer.File[] },
   ) {
-    const pathFile = await this.exerciseService.saveVideoToServer(file);
+    const pathFile = await this.exerciseService.saveVideoToServer(obj.file[0]);
+    // const pathThumbnail = await this.exerciseService.saveVideoToServer(obj.thumbnail[0]);
     createExerciseDto.createdBy = user._id;
 
-    return this.exerciseService.create(createExerciseDto, pathFile);
+    return await this.exerciseService.create(createExerciseDto, pathFile);
   }
 
   @Get()

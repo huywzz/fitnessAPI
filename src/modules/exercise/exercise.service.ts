@@ -8,6 +8,7 @@ import * as fs from 'fs';
 import { UserService } from '../user/user.service';
 import { Role } from '@/schema/enums/role.enum';
 import { Types } from 'mongoose';
+import * as sharp from 'sharp';
 
 @Injectable()
 export class ExerciseService {
@@ -23,12 +24,28 @@ export class ExerciseService {
   }
   async create(createExerciseDto: CreateExerciseDto, pathFile: string) {
     const user = await this.userService.findOneById(createExerciseDto.createdBy);
+
     if (user.role !== Role.TRAINER) {
       throw new ForbiddenException();
     }
-    const url = await this.cloudService.uploadImage(pathFile);
-    createExerciseDto.gifUrl = url.url;
-    fs.unlinkSync(pathFile);
+    const gifData = fs.readFileSync(pathFile);
+
+    const thumbnailPath = pathFile.replace('.gif', '.png');
+    await sharp(gifData, { pages: 1 }).png().toFile(thumbnailPath);
+
+    const videoUrl = await this.cloudService.uploadImage(pathFile);
+    const thumbnailUrl = await this.cloudService.uploadImage(thumbnailPath);
+
+    createExerciseDto.gifUrl = videoUrl.url;
+    createExerciseDto.thumbnail = thumbnailUrl.url;
+
+    fs.unlink(pathFile, (err) => {
+      if (err) console.error('Error deleting file:', err);
+    });
+    fs.unlink(thumbnailPath, (err) => {
+      if (err) console.error('Error deleting file:', err);
+    });
+
     return await this.exRepository.create(createExerciseDto);
   }
 
