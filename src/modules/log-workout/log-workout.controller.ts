@@ -25,6 +25,15 @@ export class LogWorkoutController {
   //   return this.logWorkoutService.findAll();
   // }
 
+  @ApiOperation({ summary: 'get plan  register by user' })
+  @UseGuards(JwtAuthGuard)
+  @Get('/user')
+  async getLogWorkout(@User() user) {
+    console.log(user);
+
+    return await this.logWorkoutService.getLogWorkout(user._id);
+  }
+
   @ApiOperation({ summary: 'detail 1 workout plan registed by user' })
   @UseGuards(JwtAuthGuard)
   @Get(':planId')
@@ -52,6 +61,10 @@ export class LogWorkoutController {
   @UseGuards(JwtAuthGuard)
   @Post('complete-excicrise')
   async complateEx(@Body() dto: UpdateExerciseCompleteDTO, @User() user) {
-    return await this.logWorkoutService.updateExerciseComplete(dto.workoutLogId, dto.dayNumber,dto.exerciseIndex);
+    return await this.logWorkoutService.updateExerciseComplete(
+      dto.workoutLogId,
+      dto.dayNumber,
+      dto.exerciseIndex,
+    );
   }
 }

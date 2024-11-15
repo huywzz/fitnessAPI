@@ -134,4 +134,17 @@ export class LogWorkoutService {
 
     return workoutLog;
   }
+
+  async getLogWorkout(userId: Types.ObjectId) {
+    return await this.logModel
+      .find({
+        userId: userId,
+      })
+      .populate('planId', 'title difficulty description image')
+      .select({
+        days: false,
+        _id: false,
+        // userId:true
+      });
+  }
 }
