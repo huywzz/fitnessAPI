@@ -2,29 +2,30 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 import { BaseSchema } from './base/base.schema';
 import { Difficulty } from './enums/difficulty.enum';
+import { BMI } from './enums/bmi.enum';
 
 export type WorkoutPlanDocument = HydratedDocument<WorkoutPlan>;
 @Schema()
 class ExerciseDetail {
-  @Prop({ type: Types.ObjectId, ref: 'Exercise' })
+  @Prop({ type: Types.ObjectId, ref: 'Exercise', default: null })
   exerciseId: Types.ObjectId;
 
-  @Prop()
+  @Prop({ default: null })
   reps: number;
 
-  @Prop()
+  @Prop({ default: null })
   sets: number;
 }
 
 @Schema()
 class Schedule {
-  @Prop()
+  @Prop({ default: null })
   title: string;
 
-  @Prop()
+  @Prop({ default: null })
   day: number;
 
-  @Prop([ExerciseDetail])
+  @Prop({default:[]})
   exercises: ExerciseDetail[];
 }
 
@@ -35,44 +36,44 @@ class Schedule {
   },
 })
 export class WorkoutPlan extends BaseSchema {
-  @Prop()
+  @Prop({ default: 'Default Title' })
   title: string;
 
-  @Prop()
+  @Prop({ default: `${process.env.DEFAULT_THUMB_PLAN}` })
   image: string;
 
-  @Prop({ type: Types.ObjectId, ref: 'User' })
+  @Prop({ type: Types.ObjectId, ref: 'User', default: null })
   userId: Types.ObjectId;
 
-  @Prop({ type: String, enum: Difficulty })
+  @Prop({ type: String, enum: Difficulty, default: Difficulty.NONE })
   difficulty: Difficulty;
 
-  @Prop()
+  @Prop({ default: 3 }) // Số ngày mặc định trong tuần
   daysPerWeek: number;
 
-  @Prop([Schedule])
+  @Prop({ default: [] }) // Lịch tập trống mặc định
   weeklySchedule: Schedule[];
 
-  @Prop([{ type: Types.ObjectId, ref: 'User' }])
+  @Prop([{ type: Types.ObjectId, ref: 'User', default: [] }])
   userIds: Types.ObjectId[];
 
-  @Prop({ type: Types.ObjectId, ref: 'Goal' })
+  @Prop({ type: Types.ObjectId, ref: 'Goal', default: null })
   goal: Types.ObjectId;
 
-  @Prop()
-  bmi: number;
+  @Prop({ type: String, enum: BMI, default: BMI.TooFat }) // BMI mặc định là 0
+  bmi: BMI;
 
-  @Prop()
+  @Prop({ default: 'No description provided' })
   description: string;
 
   @Prop({ default: false })
   isUser: boolean;
 
-  @Prop({ type: Number })
+  @Prop({ default: 1 }) // Số chu kỳ mặc định là 1
   cycle: number;
 
-  @Prop({ type: Number })
-  totalDayOfPlan:number
+  @Prop({ default: 30 }) // Tổng số ngày mặc định của kế hoạch là 30
+  totalDayOfPlan: number;
 }
 
 export const WorkoutPlanSchema = SchemaFactory.createForClass(WorkoutPlan);

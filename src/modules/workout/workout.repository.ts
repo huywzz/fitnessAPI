@@ -3,6 +3,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { CreateWorkoutPlanDto } from './dto/create-workout.dto';
 import { Difficulty } from '@/schema/enums/difficulty.enum';
+import { BMI } from '@/schema/enums/bmi.enum';
+import { CreatePlanDto } from './dto/create-plan.dto';
 
 export class WorkoutRepository {
   constructor(@InjectModel(WorkoutPlan.name) private workOutModel: Model<WorkoutPlan>) {}
@@ -62,7 +64,7 @@ export class WorkoutRepository {
       });
   }
 
-  async findByQuery(obj:{}) {
+  async findByQuery(obj: {}) {
     return await this.workOutModel
       .find(obj)
       .select({
@@ -71,5 +73,10 @@ export class WorkoutRepository {
         difficulty: true,
       })
       .exec();
+  }
+
+  async create(dto: CreatePlanDto) {
+    const workoutPlan = new this.workOutModel(dto);
+    return workoutPlan.save();
   }
 }

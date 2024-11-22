@@ -1,6 +1,7 @@
 import { BMI } from '@/schema/enums/bmi.enum';
 import { Difficulty } from '@/schema/enums/difficulty.enum';
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import {
   IsArray,
   IsEnum,
@@ -33,7 +34,7 @@ export class ExerciseDetailDto {
 export class ScheduleDto {
   @ApiProperty({
     description: 'Tên ngày tập',
-    example: 'Bụng + vai',
+    example: 'Biceps+Core',
   })
   @IsString()
   @IsNotEmpty()
@@ -130,10 +131,11 @@ export class CreateWorkoutPlanDto {
 
   @ApiProperty({
     description: 'BMI là bao nhiêu để được rcm plan này',
-    example: 1,
+    example: BMI.TooSkinny,
     required: false,
   })
   @IsOptional()
+  @Transform(({ value }) => parseInt(value, 10))
   @IsEnum(BMI)
   bmi?: BMI;
 
@@ -149,4 +151,8 @@ export class CreateWorkoutPlanDto {
 
   @IsOptional()
   isUser: boolean;
+
+  @IsOptional()
+  @IsNumber()
+  totalDayOfPlan: number;
 }

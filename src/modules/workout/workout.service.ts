@@ -11,6 +11,10 @@ import { ExerciseService } from '../exercise/exercise.service';
 import { RegisterWorkoutDTO } from './dto/register-workout.dto';
 import { LogWorkoutService } from '../log-workout/log-workout.service';
 import { Difficulty } from '@/schema/enums/difficulty.enum';
+import { CreatePlanDto } from './dto/create-plan.dto';
+import { convertObjectId } from '@/shared/utils/converToObjId';
+import { AddEXDto } from './dto/add.ex.dto';
+import { RecommendPlanDTO } from './dto/rcm-plan.dto';
 
 @Injectable()
 export class WorkoutService {
@@ -72,6 +76,14 @@ export class WorkoutService {
     return await this.workoutRepository.findByGoal(goal);
   }
 
+  async rcmPlan(dto: RecommendPlanDTO) {
+    const obj = convertObjectId(dto.goal);
+    return await this.workoutRepository.findByQuery({
+      bmi: dto.bmi,
+      goal: obj,
+    });
+  }
+
   async findByQuery(goal?: string, difficulty?: Difficulty) {
     let obj: any = {};
 
@@ -111,5 +123,29 @@ export class WorkoutService {
         resolve(filePath);
       });
     });
+  }
+
+  async createByTrainer(dto: CreatePlanDto, pathThumb: string) {
+    const obj = convertObjectId(dto.userId);
+    const goal = convertObjectId(dto.goal);
+    dto.goal = goal;
+    const foundTrainer = await this.userService.findOneById(obj);
+    if (foundTrainer.role === Role.USER) {
+      throw new ForbiddenException();
+    }
+    const thumbUrl = await this.cloudService.uploadImage(pathThumb);
+    dto.image = thumbUrl.url;
+    return await this.workoutRepository.create(dto);
+  }
+
+  async addExToPlan(id: string, arr: any[]) {
+    const obj = convertObjectId(id);
+    const foundPlan = await this.workoutRepository.findById(obj);
+    if (!foundPlan) {
+      throw new NotFoundException('Workout plan not found');
+    }
+
+    foundPlan.weeklySchedule.push(...arr);
+    return await foundPlan.save();
   }
 }

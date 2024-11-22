@@ -23,6 +23,9 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { RegisterWorkoutDTO } from './dto/register-workout.dto';
 import { Difficulty } from '@/schema/enums/difficulty.enum';
 import { QueryWorkoutDTO } from './dto/query-workout.dto';
+import { CreatePlanDto } from './dto/create-plan.dto';
+import { AddEXDto } from './dto/add.ex.dto';
+import { RecommendPlanDTO } from './dto/rcm-plan.dto';
 
 @ApiTags('workout')
 @ApiBearerAuth('jwt')
@@ -30,19 +33,46 @@ import { QueryWorkoutDTO } from './dto/query-workout.dto';
 export class WorkoutController {
   constructor(private readonly workoutService: WorkoutService) {}
 
-  @ApiOperation({ summary: 'create workout plan' })
+  // @ApiOperation({ summary: 'create workout plan' })
   // @UseInterceptors(FileInterceptor('file'))
+  // @UseGuards(JwtAuthGuard)
+  // @Post()
+  // async create(
+  //   @Body() createWorkoutDto: CreateWorkoutPlanDto,
+  //   @User() user,
+  //   // @UploadedFile() file?: Express.Multer.File,
+  // ) {
+  //   createWorkoutDto.userId = user._id;
+  //   return await this.workoutService.create(createWorkoutDto);
+  // }
+
+  @ApiOperation({ summary: 'create workout plan without ex' })
+  @UseInterceptors(FileInterceptor('file'))
   @UseGuards(JwtAuthGuard)
   @Post()
-  async create(
-    @Body() createWorkoutDto: CreateWorkoutPlanDto,
-    @User() user,
-    // @UploadedFile() file?: Express.Multer.File,
-  ) {
-    createWorkoutDto.userId = user._id;
-    return await this.workoutService.create(createWorkoutDto);
+  async create(@Body() dto: CreatePlanDto, @User() user, @UploadedFile() file?: Express.Multer.File) {
+    let path = null;
+    if (file) {
+      path = await this.workoutService.saveVideoToServer(file);
+    } else {
+      path = process.env.DEFAULT_THUMB_PLAN;
+    }
+    dto.userId = user._id;
+    return await this.workoutService.createByTrainer(dto, path);
   }
-  
+
+  @ApiOperation({ summary: 'Add ex to plan' })
+  @Post(':id/add-schedule')
+  async addExToPlan(@Param('id') id: string, @Body() dto: AddEXDto) {
+    return await this.workoutService.addExToPlan(id, dto.schedules);
+  }
+
+  @ApiOperation({ summary: 'rcm workout plan with bmi and goal' })
+  @Get('/recommend-plan')
+  async rcmPlan(@Query() dto: RecommendPlanDTO) {
+    return await this.workoutService.rcmPlan(dto);
+  }
+
   @ApiOperation({ summary: 'find workout plan' })
   @Get('/find')
   async findByQuery(@Query() dto: QueryWorkoutDTO) {
