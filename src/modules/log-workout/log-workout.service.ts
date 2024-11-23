@@ -67,6 +67,13 @@ export class LogWorkoutService {
     });
   }
 
+  async getOne(planId: any, userId: any) {
+    return await this.logModel.findOne({
+      planId: planId,
+      userId: userId,
+    });
+  }
+
   update(id: number, updateLogWorkoutDto: UpdateLogWorkoutDto) {
     return `This action updates a #${id} logWorkout`;
   }

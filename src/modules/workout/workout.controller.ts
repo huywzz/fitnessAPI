@@ -84,11 +84,7 @@ export class WorkoutController {
   @ApiOperation({ summary: 'Update ex of plan' })
   @UseGuards(JwtAuthGuard)
   @Patch(':id/update-ex')
-  async updatePlanWithEx(
-    @Param('id') id,
-    @Body() dto: UpdateWeeklyScheduleDto,
-    @User() user,
-  ) {
+  async updatePlanWithEx(@Param('id') id, @Body() dto: UpdateWeeklyScheduleDto, @User() user) {
     return await this.workoutService.updateWeeklySchedule(id, dto);
   }
 
@@ -110,6 +106,13 @@ export class WorkoutController {
     console.log(dto);
 
     return await this.workoutService.findByQuery(dto.goal, dto.difficulty);
+  }
+  @ApiOperation({ summary: 'get plans is registed by user' })
+  @UseGuards(JwtAuthGuard)
+  @Get('/user-registed')
+  async getWorkoutRegistedByUser(@User() user) {
+    console.log(user);
+    return await this.workoutService.getWorkoutRegistedByUser(user._id);
   }
 
   @ApiOperation({ summary: 'get all workout plan' })

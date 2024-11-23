@@ -34,6 +34,14 @@ class Progress {
   goalWeight: number;
 }
 
+class SelectedPlan {
+  @Prop({ type: Types.ObjectId, ref: 'WorkoutPlan' })
+  plan_id: Types.ObjectId;
+
+  @Prop({ type: Boolean, default: false })
+  isUsing: boolean;
+}
+
 @Schema({
   timestamps: {
     createdAt: 'created_at',
@@ -60,20 +68,9 @@ export class User extends BaseSchema {
   role: Role;
 
   @Prop({
-    type: [
-      {
-        plan_id: { type: Types.ObjectId, ref: 'WorkoutPlan' },
-        start_date: Date,
-        end_date: Date,
-      },
-    ],
-    default: [],
+    default: [], // Default is an empty array
   })
-  selectedPlans: Array<{
-    plan_id: { type: Types.ObjectId; ref: 'WorkoutPlan' };
-    start_date: Date;
-    end_date: Date;
-  }>;
+  selectedPlans: SelectedPlan[]
 
   @Prop([{ type: Types.ObjectId, ref: 'WorkoutPlan' }])
   customPlanIds: Types.ObjectId[];

@@ -1,4 +1,11 @@
-import { ForbiddenException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateWorkoutPlanDto } from './dto/create-workout.dto';
 import { WorkoutRepository } from './workout.repository';
 import { Types } from 'mongoose';
@@ -107,7 +114,40 @@ export class WorkoutService {
   }
 
   async registerPlan(dto: RegisterWorkoutDTO, userId: string) {
+    const newUserId = convertObjectId(userId);
+    const newPlanId = convertObjectId(dto.planId);
+    const foundLog = await this.logService.getOne(newPlanId, newUserId);
+    if (foundLog) {
+      throw new BadRequestException('Exist log');
+    }
     const result = await this.logService.create(userId, dto.planId);
+
+    const foundUser = await this.userService.findOneById(newUserId);
+    const foundPlan = await this.findOne(dto.planId);
+    if (!foundPlan) {
+      throw new BadRequestException('Not found plan');
+    }
+    foundPlan.userIds.push(newUserId);
+    await foundPlan.save();
+
+    if (!foundUser) {
+      throw new BadRequestException();
+    }
+
+    const { selectedPlans } = foundUser;
+    const newSelect = [...selectedPlans];
+    newSelect.forEach((plan) => {
+      plan.isUsing = false;
+      return plan;
+    });
+
+    newSelect.push({
+      plan_id: newPlanId,
+      isUsing: true,
+    });
+    foundUser.selectedPlans = newSelect;
+    await foundUser.save();
+
     return result;
   }
 
@@ -185,18 +225,22 @@ export class WorkoutService {
         exercise.exerciseId = new Types.ObjectId(exercise.exerciseId);
       });
     });
-    const {weeklySchedule}=dto
+    const { weeklySchedule } = dto;
     const filter = {
       _id: objId,
     };
 
     const update = {
-      weeklySchedule
+      weeklySchedule,
     };
 
     const option = {
       new: true,
     };
     return await this.workoutRepository.updatePlan(filter, update, option);
+  }
+
+  async getWorkoutRegistedByUser(userId: Types.ObjectId) {
+    return await this.userService.findOneById(userId)
   }
 }

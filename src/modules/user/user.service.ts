@@ -26,7 +26,7 @@ export class UserService {
   }
 
   async findAll() {
-    return this.userRepository.findAll()
+    return this.userRepository.findAll();
   }
 
   async findOneOrThrowById(id: any) {
@@ -89,8 +89,12 @@ export class UserService {
   }
 
   async findOneById(id: any) {
-    return this.userRepository.findOneUser({
+    return await this.userRepository.findOneUser({
       _id: id,
-    });
+    })
   }
+
+  // async updateManySelectedPlans(userId: Types.ObjectId, update: any, options?: any) {
+  //   return await this.
+  // }
 }
