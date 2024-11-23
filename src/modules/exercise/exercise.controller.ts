@@ -15,13 +15,14 @@ import { ExerciseService } from './exercise.service';
 import { CreateExerciseDto } from './dto/create-exercise.dto';
 import { UpdateExerciseDto } from './dto/update-exercise.dto';
 import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '@/shared/guards/jwt-auth.guard';
 import { User } from '@/shared/decorators/user.decorator';
 
 import sharp from 'sharp';
 
 @ApiTags('exercise')
+@ApiBearerAuth('jwt')
 @Controller('exercise')
 export class ExerciseController {
   constructor(private readonly exerciseService: ExerciseService) {}
@@ -59,9 +60,22 @@ export class ExerciseController {
     return await this.exerciseService.findOne(id);
   }
 
+  @ApiOperation({ summary: 'update ex' })
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateExerciseDto: UpdateExerciseDto) {
-    return this.exerciseService.update(+id, updateExerciseDto);
+  @UseInterceptors(FileInterceptor('file'))
+  async update(
+    @Param('id') id: string,
+    @Body() updateExerciseDto: UpdateExerciseDto,
+    @User() user,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    updateExerciseDto.createdBy = user._id;
+    if (file) {
+      const path = await this.exerciseService.saveVideoToServer(file);
+      return await this.exerciseService.update(id, updateExerciseDto, path);
+    }
+    return await this.exerciseService.update(id, updateExerciseDto);
   }
 
   @Delete(':id')

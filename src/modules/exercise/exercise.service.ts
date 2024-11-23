@@ -9,6 +9,7 @@ import { UserService } from '../user/user.service';
 import { Role } from '@/schema/enums/role.enum';
 import { Types } from 'mongoose';
 import * as sharp from 'sharp';
+import { convertObjectId } from '@/shared/utils/converToObjId';
 
 @Injectable()
 export class ExerciseService {
@@ -61,8 +62,53 @@ export class ExerciseService {
     return await this.exRepository.findById(id);
   }
 
-  update(id: number, updateExerciseDto: UpdateExerciseDto) {
-    return `This action updates a #${id} exercise`;
+  async update(id: string, updateExerciseDto: UpdateExerciseDto, pathFile?: string) {
+    const obj = convertObjectId(id);
+    let objCate;
+    let objCreatedBy;
+    const { category, createdBy, ...other } = updateExerciseDto;
+    objCreatedBy = convertObjectId(createdBy);
+    
+    const foundTrainer = await this.userService.findOneById(objCreatedBy);
+    if (foundTrainer.role === Role.USER) {
+      throw new ForbiddenException();
+    }
+    if (category) {
+      objCate = convertObjectId(category);
+    }
+
+    if (pathFile) {
+      const gifData = fs.readFileSync(pathFile);
+
+      const thumbnailPath = pathFile.replace('.gif', '.png');
+      await sharp(gifData, { pages: 1 }).png().toFile(thumbnailPath);
+
+      const videoUrl = await this.cloudService.uploadImage(pathFile);
+      const thumbnailUrl = await this.cloudService.uploadImage(thumbnailPath);
+
+      other.gifUrl = videoUrl.url;
+      other.thumbnail = thumbnailUrl.url;
+
+      fs.unlink(pathFile, (err) => {
+        if (err) console.error('Error deleting file:', err);
+      });
+      fs.unlink(thumbnailPath, (err) => {
+        if (err) console.error('Error deleting file:', err);
+      });
+    }
+    const filter = {
+      _id: obj,
+    };
+    const update = {
+      ...other,
+      category: objCate,
+      createdBy: objCreatedBy,
+    };
+    const option = {
+      new: true,
+    };
+    
+    return await this.exRepository.updateExercise(filter, update, option);
   }
 
   remove(id: number) {

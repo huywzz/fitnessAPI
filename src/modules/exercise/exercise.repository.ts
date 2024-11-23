@@ -50,4 +50,8 @@ export class ExerciseRepository {
       .populate('category')
       .exec();
   }
+
+  async updateExercise(filter: {}, update: {}, option: {}) {
+    return await this.exerciseModel.findOneAndUpdate(filter, update, option);
+  }
 }
