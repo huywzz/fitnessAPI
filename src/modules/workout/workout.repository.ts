@@ -19,6 +19,8 @@ export class WorkoutRepository {
       .findById(id)
       .populate({
         path: 'weeklySchedule.exercises.exerciseId',
+        model: 'Exercise',
+        select: 'name gifUrl',
       })
       .exec();
   }
@@ -78,5 +80,8 @@ export class WorkoutRepository {
   async create(dto: CreatePlanDto) {
     const workoutPlan = new this.workOutModel(dto);
     return workoutPlan.save();
+  }
+  async updatePlan(filter: {}, update: {}, option: {}) {
+    return await this.workOutModel.findOneAndUpdate(filter, update, option);
   }
 }

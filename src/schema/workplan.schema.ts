@@ -25,7 +25,7 @@ class Schedule {
   @Prop({ default: null })
   day: number;
 
-  @Prop({default:[]})
+  @Prop({ default: [] })
   exercises: ExerciseDetail[];
 }
 
@@ -51,7 +51,7 @@ export class WorkoutPlan extends BaseSchema {
   @Prop({ default: 3 }) // Số ngày mặc định trong tuần
   daysPerWeek: number;
 
-  @Prop({ default: [] }) // Lịch tập trống mặc định
+  @Prop({ type: [Schedule], default: [] }) // Lịch tập trống mặc định
   weeklySchedule: Schedule[];
 
   @Prop([{ type: Types.ObjectId, ref: 'User', default: [] }])

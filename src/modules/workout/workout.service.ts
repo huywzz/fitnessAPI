@@ -15,6 +15,8 @@ import { CreatePlanDto } from './dto/create-plan.dto';
 import { convertObjectId } from '@/shared/utils/converToObjId';
 import { AddEXDto } from './dto/add.ex.dto';
 import { RecommendPlanDTO } from './dto/rcm-plan.dto';
+import { UpdateWorkoutDto } from './dto/update-workout.dto';
+import { UpdateWeeklyScheduleDto } from './dto/update-week.dto';
 
 @Injectable()
 export class WorkoutService {
@@ -147,5 +149,54 @@ export class WorkoutService {
 
     foundPlan.weeklySchedule.push(...arr);
     return await foundPlan.save();
+  }
+
+  async updateInformationPlan(id: string, dto: UpdateWorkoutDto, image?: string) {
+    const { goal, ...other } = dto;
+    const objId = convertObjectId(id);
+    let objGoal;
+    if (goal) {
+      objGoal = convertObjectId(goal);
+    }
+    if (image) {
+      const thumbUrl = await this.cloudService.uploadImage(image);
+      other.image = thumbUrl.url;
+    }
+    const filter = {
+      _id: objId,
+    };
+
+    const update = {
+      ...other,
+      goal: objGoal,
+    };
+
+    const option = {
+      new: true,
+    };
+
+    return await this.workoutRepository.updatePlan(filter, update, option);
+  }
+
+  async updateWeeklySchedule(id: string, dto: UpdateWeeklyScheduleDto) {
+    const objId = convertObjectId(id);
+    dto.weeklySchedule.forEach((schedule) => {
+      schedule.exercises.forEach((exercise) => {
+        exercise.exerciseId = new Types.ObjectId(exercise.exerciseId);
+      });
+    });
+    const {weeklySchedule}=dto
+    const filter = {
+      _id: objId,
+    };
+
+    const update = {
+      weeklySchedule
+    };
+
+    const option = {
+      new: true,
+    };
+    return await this.workoutRepository.updatePlan(filter, update, option);
   }
 }

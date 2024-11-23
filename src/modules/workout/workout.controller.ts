@@ -26,6 +26,8 @@ import { QueryWorkoutDTO } from './dto/query-workout.dto';
 import { CreatePlanDto } from './dto/create-plan.dto';
 import { AddEXDto } from './dto/add.ex.dto';
 import { RecommendPlanDTO } from './dto/rcm-plan.dto';
+import { UpdateWorkoutDto } from './dto/update-workout.dto';
+import { UpdateWeeklyScheduleDto } from './dto/update-week.dto';
 
 @ApiTags('workout')
 @ApiBearerAuth('jwt')
@@ -59,6 +61,35 @@ export class WorkoutController {
     }
     dto.userId = user._id;
     return await this.workoutService.createByTrainer(dto, path);
+  }
+
+  @ApiOperation({ summary: 'Update basic information of plan without ex' })
+  @UseInterceptors(FileInterceptor('file'))
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id/update-infor')
+  async updateInforPlan(
+    @Param('id') id,
+    @Body() dto: UpdateWorkoutDto,
+    @User() user,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    let path = null;
+    if (file) {
+      path = await this.workoutService.saveVideoToServer(file);
+      return await this.workoutService.updateInformationPlan(id, dto, path);
+    }
+    return await this.workoutService.updateInformationPlan(id, dto);
+  }
+
+  @ApiOperation({ summary: 'Update ex of plan' })
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id/update-ex')
+  async updatePlanWithEx(
+    @Param('id') id,
+    @Body() dto: UpdateWeeklyScheduleDto,
+    @User() user,
+  ) {
+    return await this.workoutService.updateWeeklySchedule(id, dto);
   }
 
   @ApiOperation({ summary: 'Add ex to plan' })
