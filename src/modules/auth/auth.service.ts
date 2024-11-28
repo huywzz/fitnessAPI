@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import * as bcrypt from 'bcrypt';
 import { SignUpEmailDto } from './dto/signUpEmail.dto';
@@ -11,6 +11,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Goal } from '@/schema/goal.schema';
 import { Model } from 'mongoose';
 import { Category } from '@/schema/category.schema';
+import { Role } from '@/schema/enums/role.enum';
 @Injectable()
 export class AuthService {
   constructor(
@@ -50,6 +51,27 @@ export class AuthService {
     return {
       accessToken: token,
       email: foundUser.email,
+      role: foundUser.role,
+    };
+  }
+
+  async loginWithoutUser(dto: LoginEmailDto) {
+    const { email, password } = dto;
+    const foundUser = await this.userService.findOneOrThrowByEmail(email);
+
+    const isMatch = await bcrypt.compare(password, foundUser.password);
+    if (!isMatch) {
+      throw new BadRequestException('Email or password is wrong');
+    }
+    if (foundUser.role === Role.USER) {
+      throw new ForbiddenException();
+    }
+    const token = this.getAccessToken(foundUser._id, email);
+
+    return {
+      accessToken: token,
+      email: foundUser.email,
+      role: foundUser.role,
     };
   }
 

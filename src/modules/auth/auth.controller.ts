@@ -35,4 +35,10 @@ export class AuthController {
   async loginBySocial(@Body() dto: LoginSocialDto) {
     return await this.authService.loginSocial(dto);
   }
+
+  @ApiOperation({ summary: 'login without user' })
+  @Post('/login-trainer')
+  async loginWithoutUser(@Body() dto: LoginEmailDto) {
+    return await this.authService.loginByEmail(dto);
+  }
 }
