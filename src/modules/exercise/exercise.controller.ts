@@ -10,6 +10,7 @@ import {
   UploadedFile,
   UseGuards,
   UploadedFiles,
+  Query,
 } from '@nestjs/common';
 import { ExerciseService } from './exercise.service';
 import { CreateExerciseDto } from './dto/create-exercise.dto';
@@ -20,6 +21,7 @@ import { JwtAuthGuard } from '@/shared/guards/jwt-auth.guard';
 import { User } from '@/shared/decorators/user.decorator';
 
 import sharp from 'sharp';
+import { PaginationQueryDTO } from '@/shared/utils/paginationQuery.dto';
 
 @ApiTags('exercise')
 @ApiBearerAuth('jwt')
@@ -51,9 +53,21 @@ export class ExerciseController {
   }
 
   @Get()
-  findAll() {
-    return this.exerciseService.findAll();
+  async findAll(@Query() paginationQuery: PaginationQueryDTO) {
+    return await this.exerciseService.findAll(paginationQuery.limit, paginationQuery.page);
   }
+
+  @ApiOperation({ summary: 'find by category' })
+  @Get('/category/:categoryId/')
+  async findByCategory(
+    @Query() paginationQuery: PaginationQueryDTO,
+    @Param('categoryId') categoryId: string,
+  ) {
+    console.log(categoryId);
+
+    return await this.exerciseService.findByCategory(categoryId, paginationQuery.limit, paginationQuery.page);
+  }
+
   @ApiOperation({ summary: 'detail ex' })
   @Get(':id')
   async findOne(@Param('id') id: string) {

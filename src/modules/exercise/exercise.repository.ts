@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { FilterQuery, Model, Types } from 'mongoose';
 import { CreateExerciseDto } from './dto/create-exercise.dto';
 import { UpdateExerciseDto } from './dto/update-exercise.dto';
 import { Exercise } from '@/schema/exercise.schema';
@@ -16,11 +16,6 @@ export class ExerciseRepository {
       createdBy: new Types.ObjectId(createExerciseDto.createdBy),
     });
     return await createdExercise.save();
-  }
-
-  // Lấy tất cả bài tập
-  async findAll(): Promise<Exercise[]> {
-    return this.exerciseModel.find().populate('category').populate('createdBy').exec();
   }
 
   // Tìm bài tập theo ID
@@ -40,15 +35,21 @@ export class ExerciseRepository {
     return this.exerciseModel.findByIdAndDelete(id).exec();
   }
 
-  // Tìm tất cả bài tập theo ID danh mục (categoryId)
-  async findByCategory(categoryId: string): Promise<Exercise[]> {
-    const category = new Types.ObjectId(categoryId);
+  async findAllPaginated(query: any, limit: number, offset: number): Promise<Exercise[]> {
+    console.log(limit, offset);
+    console.log(query);
+
     return this.exerciseModel
-      .find({
-        category: category,
-      })
+      .find(query) // Truyền query để tìm theo điều kiện
       .populate('category')
+      .populate('createdBy')
+      .skip(offset)
+      .limit(limit)
       .exec();
+  }
+  // Lấy tổng số bản ghi
+  async countDocuments(query: FilterQuery<Exercise>): Promise<number> {
+    return this.exerciseModel.countDocuments(query);
   }
 
   async updateExercise(filter: {}, update: {}, option: {}) {

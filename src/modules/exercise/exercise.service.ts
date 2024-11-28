@@ -10,6 +10,8 @@ import { Role } from '@/schema/enums/role.enum';
 import { Types } from 'mongoose';
 import * as sharp from 'sharp';
 import { convertObjectId } from '@/shared/utils/converToObjId';
+import { PaginationResult } from '@/shared/interfaces/pagination-result.interface';
+import { Exercise } from '@/schema/exercise.schema';
 
 @Injectable()
 export class ExerciseService {
@@ -50,12 +52,27 @@ export class ExerciseService {
     return await this.exRepository.create(createExerciseDto);
   }
 
-  async findByCategory(categoryId: string) {
-    return await this.exRepository.findByCategory(categoryId);
+  private async paginate(query: any, limit: number, page: number) {
+    const totalRecords = await this.exRepository.countDocuments(query); // Đếm tổng số bản ghi theo query
+    const totalPages = Math.ceil(totalRecords / limit);
+    const offset = (page - 1) * limit;
+    const data = await this.exRepository.findAllPaginated(query, limit, offset); // Truyền query vào repository
+
+    return {
+      totalPages,
+      currentPage: page,
+      limit: limit,
+      data,
+    };
   }
 
-  findAll() {
-    return `This action returns all exercise`;
+  async findAll(limit = 10, page = 1) {
+    return await this.paginate({}, limit, page);
+  }
+
+  async findByCategory(categoryId: string, limit = 10, offset = 0) {
+    const category = convertObjectId(categoryId);
+    return this.paginate({ category: category }, limit, offset);
   }
 
   async findOne(id: string) {
@@ -68,7 +85,7 @@ export class ExerciseService {
     let objCreatedBy;
     const { category, createdBy, ...other } = updateExerciseDto;
     objCreatedBy = convertObjectId(createdBy);
-    
+
     const foundTrainer = await this.userService.findOneById(objCreatedBy);
     if (foundTrainer.role === Role.USER) {
       throw new ForbiddenException();
@@ -107,7 +124,7 @@ export class ExerciseService {
     const option = {
       new: true,
     };
-    
+
     return await this.exRepository.updateExercise(filter, update, option);
   }
 
