@@ -52,6 +52,7 @@ export class ExerciseController {
     return await this.exerciseService.create(createExerciseDto, pathFile);
   }
 
+  @ApiOperation({ summary: 'get all ex' })
   @Get()
   async findAll(@Query() paginationQuery: PaginationQueryDTO) {
     return await this.exerciseService.findAll(paginationQuery.limit, paginationQuery.page);

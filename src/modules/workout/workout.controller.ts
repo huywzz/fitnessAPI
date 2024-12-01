@@ -28,6 +28,7 @@ import { AddEXDto } from './dto/add.ex.dto';
 import { RecommendPlanDTO } from './dto/rcm-plan.dto';
 import { UpdateWorkoutDto } from './dto/update-workout.dto';
 import { UpdateWeeklyScheduleDto } from './dto/update-week.dto';
+import { PaginationQueryDTO } from '@/shared/utils/paginationQuery.dto';
 
 @ApiTags('workout')
 @ApiBearerAuth('jwt')
@@ -117,8 +118,20 @@ export class WorkoutController {
 
   @ApiOperation({ summary: 'get all workout plan' })
   @Get()
-  async findAll() {
-    return await this.workoutService.findAll();
+  @Get()
+  async findAll(@Query() paginationQuery: PaginationQueryDTO) {
+    return await this.workoutService.findAll(paginationQuery.limit, paginationQuery.page);
+  }
+
+  @ApiOperation({ summary: 'find by goal' })
+  @Get('/goal/:goalId/')
+  async findByCategory(
+    @Query() paginationQuery: PaginationQueryDTO,
+    @Param('goalId') goalId: string,
+  ) {
+    console.log(goalId);
+
+    return await this.workoutService.findByGoal(goalId, paginationQuery.limit, paginationQuery.page);
   }
 
   @ApiOperation({ summary: 'detail workout plan' })

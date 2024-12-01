@@ -36,9 +36,6 @@ export class ExerciseRepository {
   }
 
   async findAllPaginated(query: any, limit: number, offset: number): Promise<Exercise[]> {
-    console.log(limit, offset);
-    console.log(query);
-
     return this.exerciseModel
       .find(query) // Truyền query để tìm theo điều kiện
       .populate('category')

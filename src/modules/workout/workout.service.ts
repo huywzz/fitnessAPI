@@ -68,8 +68,27 @@ export class WorkoutService {
     return workoutPlan;
   }
 
-  async findAll() {
-    return await this.workoutRepository.findAll();
+  private async paginate(query: any, limit: number, page: number) {
+    const totalRecords = await this.workoutRepository.countDocuments(query); // Đếm tổng số bản ghi theo query
+    const totalPages = Math.ceil(totalRecords / limit);
+    const offset = (page - 1) * limit;
+    const data = await this.workoutRepository.findAllPaginated(query, limit, offset); // Truyền query vào repository
+
+    return {
+      totalPages,
+      currentPage: page,
+      limit: limit,
+      data,
+    };
+  }
+
+  async findAll(limit = 10, page = 1) {
+    return await this.paginate({}, limit, page);
+  }
+
+  async findByGoal(goalId: string, limit = 10, offset = 0) {
+    const goal = convertObjectId(goalId);
+    return this.paginate({ goal: goal }, limit, offset);
   }
 
   async findOne(id: string) {
@@ -241,6 +260,6 @@ export class WorkoutService {
   }
 
   async getWorkoutRegistedByUser(userId: Types.ObjectId) {
-    return await this.userService.findOneById(userId)
+    return await this.userService.findOneById(userId);
   }
 }

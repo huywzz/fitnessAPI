@@ -1,6 +1,6 @@
 import { WorkoutPlan } from '@/schema/workplan.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { FilterQuery, Model, Types } from 'mongoose';
 import { CreateWorkoutPlanDto } from './dto/create-workout.dto';
 import { Difficulty } from '@/schema/enums/difficulty.enum';
 import { BMI } from '@/schema/enums/bmi.enum';
@@ -83,5 +83,19 @@ export class WorkoutRepository {
   }
   async updatePlan(filter: {}, update: {}, option: {}) {
     return await this.workOutModel.findOneAndUpdate(filter, update, option);
+  }
+
+  async findAllPaginated(query: any, limit: number, offset: number): Promise<WorkoutPlan[]> {
+    return this.workOutModel
+      .find(query) // Truyền query để tìm theo điều kiện
+      .populate('goal')
+      .select(['-weeklySchedule', '-userIds'])
+      .skip(offset)
+      .limit(limit)
+      .exec();
+  }
+
+  async countDocuments(query: FilterQuery<WorkoutPlan>): Promise<number> {
+    return this.workOutModel.countDocuments(query);
   }
 }
