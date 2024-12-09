@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -35,16 +35,31 @@ export class CategoryService {
     return await this.exService.findByCategory(categoryId);
   }
 
+  
   async findAll() {
     return await this.cateModel.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} category`;
+  async findOne(id: string) {
+    return await this.cateModel.findById(id)
   }
 
-  update(id: number, updateCategoryDto: UpdateCategoryDto) {
-    return `This action updates a #${id} category`;
+  async update(id: string, updateGoalDto: UpdateCategoryDto, path?: string) {
+    const foundCate = await this.cateModel.findById(id);
+
+    if (!foundCate) {
+      throw new BadRequestException('Category not found');
+    }
+    if (updateGoalDto.name) {
+      foundCate.name = updateGoalDto.name;
+    }
+    if (path) {
+      const url = await this.cloudService.uploadImage(path);
+      fs.unlinkSync(path);
+      foundCate.image = url.url;
+    }
+
+    return await foundCate.save();
   }
 
   remove(id: number) {

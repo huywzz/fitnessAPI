@@ -40,9 +40,26 @@ export class CategoryController {
     return await this.categoryService.findByCategory(id);
   }
 
+  @ApiOperation({ summary: 'detail category' })
+  @Get('/detail/:id')
+  async detailCategory(@Param('id') id: string) {
+    return await this.categoryService.findOne(id);
+  }
+
+  @ApiOperation({ summary: 'update category' })
+  @UseInterceptors(FileInterceptor('file'))
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCategoryDto: UpdateCategoryDto) {
-    return this.categoryService.update(+id, updateCategoryDto);
+  async update(
+    @Param('id') id: string,
+    @Body() updateGoalDto: UpdateCategoryDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    if (file) {
+      const path = await this.categoryService.saveVideoToServer(file);
+      return await this.categoryService.update(id, updateGoalDto, path);
+    }
+
+    return await this.categoryService.update(id, updateGoalDto);
   }
 
   @Delete(':id')

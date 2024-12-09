@@ -38,9 +38,26 @@ export class GoalController {
     return await this.goalService.findManyById(id);
   }
 
+  @ApiOperation({ summary: 'get detail goal' })
+  @Get('/detail/:id')
+  async findOneGoal(@Param('id') id: string) {
+    return await this.goalService.findOneGoal(id);
+  }
+
+  @ApiOperation({ summary: 'update goal' })
+  @UseInterceptors(FileInterceptor('file'))
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateGoalDto: UpdateGoalDto) {
-    return this.goalService.update(+id, updateGoalDto);
+  async update(
+    @Param('id') id: string,
+    @Body() updateGoalDto: UpdateGoalDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    if (file) {
+      const path = await this.goalService.saveVideoToServer(file);
+      return await this.goalService.update(id, updateGoalDto, path);
+    }
+
+    return await this.goalService.update(id, updateGoalDto);
   }
 
   @Delete(':id')
